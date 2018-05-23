@@ -49,8 +49,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	DIPLOMA INFO
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\ttitle}{Distribuirane storitve v decentraliziranem svetu}
-\newcommand{\ttitleEn}{Distributed...}
+\newcommand{\ttitle}{Mikrostoritve v decentraliziranem okolju}
+\newcommand{\ttitleEn}{Microservices in decentralized environment}
 \newcommand{\tsubject}{\ttitle}
 \newcommand{\tsubjectEn}{\ttitleEn}
 \newcommand{\tauthor}{Primož Hrovat}
@@ -359,14 +359,28 @@ TODO
 \pagestyle{fancy}
 
 \chapter{Uvod}
-UVOD
+Poslovne storitve se danes selijo v oblak.
+S pojavom arhitekture mikrostoritev in podporne tehnologije, kot so vsebniki in okolja za orkestracijo vsebnikov, so, nekdaj ogromni, kosi programske opreme pričeli razpadati na manjše, logično ločene sestavne dele.
+Razmeroma majhne in neodvisne aplikacije, specializirane za opravljanje točno določenih nalog, omogočajo hiter vzpostavitveni čas in puščajo majhen odtis na porabi strojne opreme.
+Neodvisnost teh aplikacij nam omogoča tudi skaliranje teh posamenznih delov celotne storitve, ko je to potrebno.
+Vsebniki so razmeroma stara tehnologija, ki je s pojavom okolja Docker doživela pravi razcvet.
+Gre za "lahko" obliko virtualizacije, virtualizacija tu poteka na nivoju procesov in ne operacijskega sistema.
+Pravi potencial vsebnikov izkoristimo šele z uporabo orkestratorjev, kot so Kubernetes, Amazon ECS, Google Container Engine (GKE), Docker Swarm, Azure Container Service in podobni.
+Ta orodja omogočajo monitoring, zaganjanje, zaustavljanje in preverjanje storitev, skladno s podanimi zahtevami.
+Storitve se izvajajo distribuirano (porazdeljeno) in replicirano, lahko tudi na fizično ločenih sistemih, kar zagotavlja visoko stopnjo odzivnosti in dosegljivosti. Stopnja dosegljivosti se danes meri na peti ali šesti decimalki (\sn{number of nines}).
 
-\chapter{Distribuirano izvajanje storitev}
-\label{ch0}
+S pojavom Bitcoina se je začel razvoj tehnologije, ki v decentraliziranem okolju omogoča varno in nespremenljivo hrambo podatkov.
+Veriženje podatkovnih blokov je v zadnjih letih s pojavom različnih organizacij kot so Hyperledger in Ethereum doživelo razcvet.
+Nova tehnologija omogoča shranjevanje podatkov, repliciranih na vseh sodelujočih entitetah v omrežju, obenem pa ohranjajo nespremenljivost.
+
+Tu se pojavlja vprašanje. 
+Ali je možno tudi poslovno logiko prestaviti v decentraliziran svet na način, da bo sodelujoči v omrežju ob klicu želene storitve vedno dobil odgovor, izvedla pa ga bo katerakoli druga entiteta, obenem pa zagotoviti pravilnost izvajana?
+Z uresničitvijo tega cilja bi miselnost decentraliziranih podatkov prestavili nivo višje, na nivo poslovne logike.
+Odzivnost in dosegljivost storitve bi s številom sodelujočih v omrežju dosegla 100\%, prav tako bi bilo praktično nemogoče izvesti napade DOS.
 
 
-
-\section{Arhitektura mikrostoritev}
+\chapter{Arhitekturni koncepti mikrostoritev}
+\label{ch1}
 
 Razvoj monolitov je enostaven in danes dobro podprt v vseh danes prisotnih razvojnih okoljih.
 Prenos in namestitev teh storitev na strežniške sisteme je enostaven, rešitev v obliki izvršljivih datotek ali s kopiranjem direktorijske strukture prenesemo v produkcijsko izvajalno okolje.
@@ -376,15 +390,26 @@ Slabosti te arhitekture se pojavijo, ko storitev postane kompleksnejša.
 Podaljša se zagonski čas (start up time), ob preobremenitvi le enega dela storitve je potrebno pognati celotno aplikacijo.
 Proces sprotne dostave (Continouos Delivery) je otežen, za posodobitev enega dela sistema, je potrebno celotno storitev zaustaviti, namestiti novo različico in jo zagnati. \cite{monolithMicroservice}
 
+
+\section{Arhitektura mikrostoritev}
+
+
+
 Arhitektura mikrostoritev omogoča
 
-\section{Docker}
+\section{Vzorci}
 
-\section{Izvajalno okolje Kubernetes}
+\subsection{metrike}
+\subsection{health}
+\subsection{discovery}
+\subsection{fault tolerance}
+
+\section{Vsebniki in orkestracija}
 
 
 \chapter{Tehnologija veriženja podatkovnih blokov}
-\label{ch1}
+\label{ch2}
+
 Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s konsenzom, sistemom "pametnih" pogodb ter drugih pomožnih tehnologij \cite{hyperledgerWeb}. V središču omrežja je glavna knjiga "ledger", ki beleži vse transakcije, izvedene na omrežju. \cite{hyperledgerDocs}
 Vsak blok v verigi predstavlja zbirko transakcij, te člene pa med seboj povezuje zgoščevalna (hash) funkcija.
 V verigo je blok moč le dodajati.
@@ -396,7 +421,9 @@ Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 
 Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe".
 
-\section{Etheretum}
+\section{Razlaga osnovnih konceptov}
+
+\section{Ethereum}
 Ethereum je decentralizirana platforma, ki izvaja "pametne" pogodbe (smart contracts) - aplikacije, ki se izvajajo natanko tako, kot so bile zapisane.
 Platforma je osnovana na verigi podatkovnih blokov, ki omogoča reprezentacijo in prenos vrednosti.
 Lahko si ga predstavljamo kot svetovni računalnik, izvajanje programske kode pa poteka na vseh sodelujočih računalnikih.
@@ -413,12 +440,12 @@ Trenutno najbolj znana in razširjena platforma je Fabric, trenutno v različici
 Od ostalih podobnih projektov se loči predvsem v privatnih omrežjih, pri katerih je sodelovanje omejeno s sistemom dovoljenj.
 Omogoča modularno izbiro načina soglasja in ga je moč prilagajati zahtevam poslovnih uporabnikov. \cite{hyperledgerIbm}
 
+
 \chapter{Koncepti registracije in odkrivanja storitev v decentraliziranem svetu}
-\label{ch2}
+\label{ch4}
 
-
-\chapter{Implementacija???}
-\label{ch3}
+\chapter{Implementacija in validacija rešitve}
+\label{ch5}
 
 
 \chapter{Zaključek}
