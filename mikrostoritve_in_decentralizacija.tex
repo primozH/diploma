@@ -428,6 +428,26 @@ Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporabl
 
 \section{Razlaga osnovnih konceptov}
 
+\subsection{Izvajalna okolja glede na zaupanje med udeleženci}
+V grobem lahko ločimo dva tipa izvajalnih okolij, glede na stopnjo zaupanja, ki ga udeleženci delijo med seboj.
+Imamo omrežje, kjer so udeleženci vnaprej znani, identificirani s strani tretje osebe, ki ji zaupajo vsi sodelujoči.
+Interakcije med njimi so varne v smislu prevzemanja odgovornosti.
+Morebitna škodoželjnost udeleženca je enostavno kaznovana, prav zaradi fizično overjenih oseb (pravnih ali fizičnih).
+
+V javnih okoljih teh ugodnosti ne uživamo.
+V omrežju lahko sodelujo kdorkoli in to povsem anonimno.
+Med udeleženci tako a priori velja načelo nezaupanja.
+Zaupa se le stanju celotne podatkovne verige.
+Tipično so za potrjevanje blokov in novih transakcij uporabljene \sn{kripto valute}, pridobljene s ti. postopkom rudarjenja.
+Ta omrežja večinoma temeljijo na ??? (BFT). \cite{hyperledgerDocs}
+
+\subsection{Zasebnost in zaupnost}
+Javne podatkovne verige so replicirane na vseh sodelujočih entitetah, kar prinaša transparentnost, obenem pa poslovnim subjektom onemogoča učinkovito sklepanje dodatnih ugodnosti, aneksov ipd. s poslovnimi partnerji.
+Ena od možnih rešitev problema je enkripcija podatkov, ki pa v tem primeru odpove.
+Vsak izmed sodelujočih ima dostop do celotne glavne knjige, kar omogoča enostavne napade s silo.
+V nadaljanju predstavljeno omrežje Fabric tu vpeljuje koncept kanalov.
+Ti predstavljajo logično grupiranje posameznih entitet in omejujejo dostop do pametnih pogodb in glavne knjige na posameznem kanalu. \cite{hyperledgerDocs}
+
 \section{Ethereum}
 Ethereum je decentralizirana platforma, ki izvaja "pametne" pogodbe (smart contracts) - aplikacije, ki se izvajajo natanko tako, kot so bile zapisane.
 Platforma je osnovana na verigi podatkovnih blokov, ki omogoča reprezentacijo in prenos vrednosti.
@@ -500,20 +520,59 @@ je naslednje stanje
  $S[i+1] = APPLY(S[i], TX[i])$.
 V primeru napake ali presežene omejitve količine plina na blok (GASLIMIT), vrni napako.
 \item Naj $S_FINAL = S[n]$. Nagrada za najden blok se izplača samo najditelju.
-\item Preveri, da je vrhnje vozlišče Merklovega drevesa stanja $S_FINAL$ enaka končnemu stanju v bloku. V tem primeru je blok veljaven.
+\item Preveri, da je vrhnje vozlišče Merklovega drevesa \textbf{CITAT!!!} stanja $S_FINAL$ enaka končnemu stanju v bloku. V tem primeru je blok veljaven.
 \end{enumerate}
 
-Koda je izvedena s strani vseh sodelujočih entitet v omrežju.
+Koda je izvedena s strani vseh sodelujočih entitet v omrežju. \cite{ethereumWhitepaper}
 
 \section{Hyperledger}
 Hyperledger je družina odprtokodnih projektov, namenjenih razvoju tehnologije veriženja podatkovnih blokov.
 Projekt deluje pod okriljem organizacije The Linux Foundation, v sodelovanju s skupnostjo.
 Med prvimi in najbolj znamimi izmed Hyperledger projektov je Hyperledger Fabric, prvotno razvit v podjetju IBM in Digital Asset.
-Pod okrilje organizacije Hyperledger spadajo še Sawtooth, Iroha, Burrow ter Indy.
+Pod okrilje projekta Hyperledger spadajo še Sawtooth, Iroha, Burrow ter Indy.
 Vsak izmed projektov na svoj način rešuje izzive s področja podatkovnih verig ali pa naslavlja ozko problemsko domeno, za primer: projekt Indy se ukvarja s problematiko spletne identitete uporabnika. \cite{hyperledgerWeb}
 Trenutno najbolj znana in razširjena platforma je Fabric, trenutno v različici 1.1.
-Od ostalih podobnih projektov se loči predvsem v privatnih omrežjih, pri katerih je sodelovanje omejeno s sistemom dovoljenj.
+Od ostalih podobnih projektov se loči predvsem v konceptu privatnih omrežjih, pri katerih je sodelovanje omejeno s sistemom dovoljenj.
 Omogoča modularno izbiro načina soglasja in ga je moč prilagajati zahtevam poslovnih uporabnikov. \cite{hyperledgerIbm}
+
+\subsection{Fabric}
+Hyperledger Fabric je v sami zasnovi namenjen poslovni uporabi.
+Omogoča modularno in prilagodljivo arhitekturo, podobno kot ostale implementacije tehnologije veriženja blokov pozna tudi pametne pogodbe, tu imenovane \sn{chain code}.
+Pametne pogodbe se tu izvajajo znotraj vsebnikov Docker in omogočajo implementacijo v poljubnem splošnonamenskem programskem jeziku.
+Drugačen je tudi postopek izvedbe transakcije.
+
+Celotno omrežje je zasnovano na predpostavki (delnega) zaupanja med sodelujočimi entitetami, za razliko od javnih omrežij.
+Enostavna je menjava implementacije protokola za doseganje konsenza, bodisi na osnovi reševanja napak ob odpovedi (Crash Fault Tolerant -- CFT) ali ??? (Byzantine Fault Tolerance -- BFT).
+Za samo delovanje ne potrebuje kriptovalute, potrjevanje transakcij in blokov pa ni nujno izvedeno s strani vseh sodelujočih, ampak le določene podmnožice, kar v teoriji omogoča paralelizacijo in posledično višjo zmogljivost.
+
+\subsubsection{Modularnost}
+Omrežje sestoji iz šestih osnovnih komponent, ki jih je moč poljubno menjati:
+\begin{enumerate}
+	\item urejevalnik (ordering service)
+	\item upravitelj članstva (membership service) - povezuje zunanje entitete z njihovimi kriptografskimi predstavitvami
+	\item P2P gossip protocol - opcijski
+	\item Pametne pogodbe (chaincode) - procesno izolacijo zagotavlja izvajanje znotraj vsebnikov Docker. 
+	Onemogočen je neposreden dostop do glavne knjige
+	\item SUPB (DBMS)
+	\item zamenljiva politika potrjevanja in validiranja
+\end{enumerate}
+
+\subsubsection{Pametne pogodbe}
+Pametne pogodbe so delčki programske kode, ki se izvajajo kot distribuirane aplikacije.
+Tri glavne značilnosti teh aplikacij so: veliko število sočasno izvajanih pametnih pogodb, dinamično dodajanje v omrežje in nevredne zaupanja.
+Obstoječi načini izvajanja pogodb so umeščene v arhitekturo \textbf{uredi-izvedi}.
+Za njih je značilno, da transakcije validirajo in sekvečno uredijo, temu pa sledi propagacija potrjenih blokov po omrežju.
+Vsaka sodelujoča entitea nato transakcije izvede v tem vrstem redu.
+Za enoličen način sekvenčnega izvajanja tu nastane potreba po novem, determinističnem programskem jeziku.
+En izmed predstavnikov je programski jezik za programiranje pogodb v omrežju Ethereum, Solidity.
+Ker je vsaka izmed transakcij izvedena s strani vsake entitete, to predstavlja veliko porabo razpoložljivih virov ter omejuje skaliranje ter performase.
+
+Fabric pametne pogodbe izvaja po arhitekturi \textbf{izvedi-uredi-validiraj}.
+Vsaka transakcija je najprej izvedena s čimer se preveri njeno pravilnost.
+Nato je urejena, glede na protokol za doseganje konseza.
+Nazadnje je transakcija validirana s strani za to pooblaščenih zunanjih entitet.
+Tu v igro vstopi domensko specifična politika potrjevanja.
+Slednje prinaša potencialno velike performančne prihranke.
 
 \textbf{TODO:} dopolni s podrobnostmi
 
