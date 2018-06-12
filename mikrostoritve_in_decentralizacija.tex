@@ -432,10 +432,78 @@ Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporabl
 Ethereum je decentralizirana platforma, ki izvaja "pametne" pogodbe (smart contracts) - aplikacije, ki se izvajajo natanko tako, kot so bile zapisane.
 Platforma je osnovana na verigi podatkovnih blokov, ki omogoča reprezentacijo in prenos vrednosti.
 Lahko si ga predstavljamo kot svetovni računalnik, izvajanje programske kode pa poteka na vseh sodelujočih računalnikih.
-Pametne pogodbe ponujajo možnost interakcije s podatkovno verigo, določeni deli kode pa se izvajajo le pod točno določenimi pogoji. \cite{ethereumWhitepaper}
+Pametne pogodbe ponujajo možnost interakcije s podatkovno verigo, določeni deli kode pa se izvajajo le pod točno določenimi pogoji.
+
+Stanje v Ethereum omrežju določajo objekti, znani kot uporabniški računi (accounts).
+Vsak račun sestavlja 20 bajtov dolg naslov, prenos sredstev in informacij med računi pa predstavlja spremembo trenutnega stanja.
+Uporabniške račune sestavljajo štiri polja:
+\begin{itemize}
+\item števec (nonce), ki preprečuje podvajanje transakcij
+\item trenutno stanje Ethra (ether balance) trenutna količina ethra v lasti računa
+\item pogodbena koda (contract code) opcijska
+\item shramba (storage) privzeto prazno
+\end{itemize}
+
+Ether je interno plačilno sredstvo v omrežju.
+Uporablja se kot nadomestilo za izvrševanje transakcij.
+Ethereum pozna dva tipa uporabniških entitet: zunanje (externally owned), določenih s privatnimi ključi in pogodbene (contract accounts), določenih s kodo.
+Zunanji računi ne obvladujejo kode, z ostalimi entitetami v omrežju pa lahko komunicirajo preko digitalno podpisanih transakcij.
+Pametne pogodbe so entitete, ki se v omrežju odzivajo na vnaprej določena sporočila: izvedejo del logike, berejo in pišejo v glavno knjigo oziroma pošljejo novo sporočilo v omrežje.
+
+\subsection{Komunikacija med entitetami}
+V omrežju obstajata dva načina komunikacije: sporočila (messages) in transakcije (transactions).
+Transakcije so podpisani podatkovni bloki, ki jih ustvarijo zunanji uporabniški računi.
+Sestavni deli transakcije so:
+\begin{itemize}
+	\item prejemnik
+	\item podpis pošiljatelja
+	\item količina prenesenega ethra
+	\item podatki (opcijsko)
+	\item STARTGAS največje dovoljeno število izvedenih računskih operacij
+	\item GASPRICE cena posamezne računske operacije
+\end{itemize}
+
+Sporočila so namenjena interni komunikaciji med pametnimi pogodbami.
+So le navidezni objekti, obstajajo izključno v izvajalnem okolju.
+Sestavlja jih:
+\begin{itemize}
+	\item pošiljatelj
+	\item prejemnik
+	\item količina prenesenega ethra
+	\item STARTGAS
+\end{itemize}
+\cite{ethereumWhitepaper}
+
+\subsection{Navidezni stroj Ethereum}
+
+Navidezni stroj je glavna abstrakcija celotnega omrežja.
+Je izvajalno okolje za pametne pogodbe v Ethereum omrežju in služi kot \sn{peskovnik} za izvajanje kode.
+Celotni navidezni stroj lahko predstavimo s terko \textbf{(stanje blokov, transakcija, sporočilo, koda, spomin, sklad, programski števec, plin)}.
+\textit{Stanje blokov} je predstavitev vseh računov s trenutnim stanjem ethra in shrambe.
+Vsaka izvedena operacija zmanjša vrednost preostale količine plina, glede na uteženost posamezne operacije.
+Transakcija se zaključi ob izvedbi zadnje operacije v programu oziroma s prekinitvijo, ko porabljena količina plina preseše največjo dovoljeno.
 
 
-\textbf{TODO:} dopolni s podrobnostmi
+\subsubsection{Potrjevanje in kreiranje blokov}
+Vsak blok v Ethereum verigi vsebuje kopijo vseh transakcij in zadnjega stanja omrežja.
+Poleg tega sta v bloku zapisani tudi zaporedna številka bloka in zahtevnost.
+Postopek validacije bloka poteka sledeče:
+\begin{enumerate}
+\item Preveri, če predhodni blok obstaja in je veljaven
+\item Preveri časovni žig bloka - večji od prejšnejga bloka, vendar ne več kot 15 v prihodnosti
+\item Preveri številko bloka, zahtevnost, izvor transakcije, izvor "strica" in omejitev količine plina
+\item Preveri veljavnost \sn{Proof of Work}
+\item Naj bo S[0] stanje na koncu predhodnega bloka
+\item Naj bo TX seznam transakcij v bloku. Za vsak 
+$\{i \mid 0,1,\dots, n-1\}$
+je naslednje stanje
+ $S[i+1] = APPLY(S[i], TX[i])$.
+V primeru napake ali presežene omejitve količine plina na blok (GASLIMIT), vrni napako.
+\item Naj $S_FINAL = S[n]$. Nagrada za najden blok se izplača samo najditelju.
+\item Preveri, da je vrhnje vozlišče Merklovega drevesa stanja $S_FINAL$ enaka končnemu stanju v bloku. V tem primeru je blok veljaven.
+\end{enumerate}
+
+Koda je izvedena s strani vseh sodelujočih entitet v omrežju.
 
 \section{Hyperledger}
 Hyperledger je družina odprtokodnih projektov, namenjenih razvoju tehnologije veriženja podatkovnih blokov.
