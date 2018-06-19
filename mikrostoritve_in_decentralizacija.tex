@@ -45,6 +45,7 @@
 
 \usepackage{color}       % dodal Solina
 \usepackage{soul}       % dodal Solina
+\usepackage{listings}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	DIPLOMA INFO
@@ -413,16 +414,20 @@ Arhitektura mikrostoritev omogoča...
  \chapter{Tehnologija veriženja podatkovnih blokov}
 \label{ch2}
 
-Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s konsenzom, sistemom "pametnih" pogodb ter drugih pomožnih tehnologij \cite{hyperledgerWeb}. V središču omrežja je glavna knjiga (ang. ledger), kjer so zabeležene vse transakcije, izvedene na omrežju. \cite{hyperledgerDocs}
-Vsak blok v verigi predstavlja zbirko transakcij, bloke pa med seboj povezuje zgoščevalna (hash) funkcija.
-V verigo je blok moč le dodajati.
-Vsak nov blok mora biti pred zapisom potrjen s strani omrežja in, preko vrednosti zgoščene funkcije prejšnjega člena, povezan v verigo blokov.
-Celotna veriga blokov je shranjena pri vsaki izemd sodelujočih entiteti.
+Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s konsenzom, sistemom "pametnih" pogodb ter drugih pomožnih tehnologij \cite{hyperledgerWeb}. Osrednja komponenta sistema je glavna knjiga (ang. ledger), ki beleži vse akcije (transakcije), izvedene na omrežju. \cite{hyperledgerDocs}
+Entiteta, ki transakcijo izvede, jo podpiše s svojim privatnim ključem.
+Skupek transakcij tvori podatkovni blok, bloki pa se med seboj povezujejo v podatkovno verigo.
+Posamezne člene verige med seboj povezuje zgoščevalna funkcija, na vhod katere postavimo zgoščeno vrednost trenutnega in prejšnjega bloka.
+Podatkovno verigo je moč vedno le podaljševati, trenutno veljavno in resnično stanje omrežja je trenutno najdaljša serija blokov.
+Celotna veriga blokov je replicirana na vsaki izmed sodelujočih entiteti.
+
 Kombinacija teh pristopov omogoča, da nobena izmed sodelujočih entitet ne more spreminjati že zapisanih blokov.
+Napad na omrežje je možen le s pridobitvijo več kot polovice vseh sodelujočih entitet v omrežju, ki bi potrjevale resničnost ponarejenih transakcij in sčasoma sestavile daljšo podatkovno verigo, ki bi obveljala kot trenutna resnica.
 S temi mehanizmi se zagotovi veljavnost in nespremenljivost podatkov v okolju, ki mu apriori ni potrebno zaupati.
 Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 
 Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe". \cite{hyperledgerDocs}
+To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije.\\
 
 \textbf{TODO:} dopolni s podrobnostmi
 
@@ -576,41 +581,51 @@ Slednje prinaša potencialno velike performančne prihranke.
 
 \textbf{TODO:} dopolni s podrobnostmi
 
-\chapter{Koncepti registracije in odkrivanja storitev v decentraliziranem svetu}
+\chapter{Koncepti registracije in odkrivanja storitev v decentraliziranem okolju}
 \label{ch4}
 
-Izvajanje storitev se danes seli v oblak, kjer se jih poljubno mnogokrat replicira glede na trenutne potrebe.
+Izvajanje storitev se danes seli v oblak, kjer se posamezne instance storitve replicira glede na trenutne potrebe.
 
-Izvajanje storitev želimo decentralizirati - vsaka sodelujoča entiteta v omrežju lahko, pod doloženimi pogoji, izvaja
+Izvajanje storitev želimo decentralizirati - vsaka sodelujoča entiteta v omrežju lahko, pod določenimi pogoji, izvaja
 katerokoli izmed nabora razpoložljivih storitev.
-Velika prednost, ki jo prinaša decentralizirano izvajanje poslovne logike je praktično nemogoč napad zavrnitev storitve (DOS) in celo 
-porazdeljena zavrnitev storitve (DDOS).
-Napadalec je zmožen posamezno sodelujočo entiteto v omrežju obremeniti do te mere, da preneha z izvajanjem določene storitve.
-V tem primeru se izvajanje storitve zaupa drugi entiteti, postopek, ki je za uporabnika povsem transparenten.
+Prednost, ki jo prinaša decentralizirano izvajanje poslovne logike je praktično nemogoč napad zavrnitev storitve (DOS) in
+porazdeljen napad zavrnitve storitve (DDOS).
+Napadalec je zmožen posamezno sodelujočo entiteto v omrežju obremeniti do te mere, da le ta preneha z izvajanjem določene storitve.
+Decentraliziran sistem bi v primeru prenehanja izvajanja storitve na eni entiteti izvajanje dodelil drugi. Postopek bi moral biti za končnega uporabnika storitve transparenten.
 
-Vsak klic storitve je možno opremiti s finančnimi podatki, uspešen klic pomeni samodejno izvedeno finančno transakcijo.
+Dodatno se vsak klic storitve opremi s finančnimi podatki in ob uspešno izvedenem klicu je izvajalec za svoje delo nagrajen.
 
 \section{Odkrivanje storitev v decentraliziranem okolju}
+Predlagana rešitev registracije in odkrivanja storitve v decentraliziranem okolju je sestavljna iz naštetih komponent:
+\begin{itemize}
+	\item Registracija nove storitve \ref{registerService}
+	\item Registracija izvajalcev \ref{registerWorker}
+	\item Registracija izvajanja \ref{registerExecution}
+	\item Odkrivanje storitev \ref{serviceDiscovery}
+\end{itemize}
 
 \subsection{Registracija nove storitve}
-
-Sodelujoče entitete so ob registraciji nove storitve o tem obveščene.
-Vsak izmed izvajalcev lahko, glede na uporabniško določene pogoje uporabljenih sistemskih sredstev, prične z izvajanjem nove storitve, če za to obstaja še neizpolnjeno naročilo.
-
+\label{registerService}
+Vsak izmed sodelujočih ima možnost v omrežje javno objaviti novo storitev, za katero navede pogoje uporabe.
+Izvorna koda oziroma izvršljiva datoteka storitve se shrani shrani v decentralizirano shrambo, temu pa sledi zapis podatkov o storivti v glavno knjigo.
+Ob uspešni registraciji se v omrežju sproži dogodek, na katerega se sodelujoče entitete odzovejo.
+Glede na lastne določene omejitve in trenutno aktivna naročila v omrežju, lahko poljuben člen omrežja prične z izvajanjem storitev.
 
 \subsection{Registracija izvajalcev}
-Vsaka digitalna entiteta si lahko lasti več izvajalcev storitev.
-Način več izvajalcev za posamezno identiteto omogoča izvajanje repliciranih procesov, ki operirajo le z enim uporabniškim računom.
-Posameznega izvajalca je potrebno registrirati v omrežju, s čimer je možno prisluženo vrednost posameznega izvajalca pripisati lastniku.
-Podatki, ki se o posameznem izvajalcu zabeležijo so: lastnik (account), unikatna številka izvajalca (id) in naslov, na katerem je izvajalec dosegljiv preko omrežja.
-Posameznemu izvajalcu se lokalno nastavi tudi omejitve glede porabe sistemskih virov, ki jih lastnik nameni izvajanju storitev.
+\label{registerWorker}
+Vsaka digitalna identiteta lahko upravlja z več izvajalnimi enotami.
+Ta pristop omogoča enemu uporabniškemu računu pripis vseh nagrad, ki jih posamezni izvajalec prisluži.
+Podatki, ki se o posameznem izvajalcu zabeležijo so: lastnik (account), unikatna številka izvajalca (id) in naslov, preko katerega je izvajalec dosegljiv.
+Posameznemu izvajalcu se lokalno konfigurira omejitve glede porabe sistemskih virov, ki jih lastnik nameni decentraliziranemu izvajanju storitev.
 
 \subsection{Registracija izvajanja storitve}
+\label{registerExecution}
 Izvorno kodo oz. izvršljivo datoteko storitve se najprej pridobi iz omrežja.
 Nadzorni proces nato storitev zažene, storitev sama pa ob inicializaciji sama izcede postopek registracije.
 V glavno knjigo se zabeleži izvajalca in storitev, ki se izvaja.
 
 \subsection{Odkrivanje storitve}
+\label{serviceDiscovery}
 Storitve, ki se trenutno izvajajo v omrežju, pridobimo z enostavnim vpogledom v glavno knjigo.
 Med razpoložljivimi storitvami odjemalec izbere eno, pridobi podatke o lokaciji izvajanja in izvede klic po izbranem protokolu.
 Od tu naprej komunikacija med storitvami poteka preko trenutnih protokolov (REST, gRPC, Event-driven).
@@ -622,7 +637,11 @@ Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 \chapter{Implementacija in validacija rešitve}
 \label{ch5}
 
-SKICA
+\begin{figure}[h]
+\includegraphics[width=1.0\textwidth]{slike/dApi.png}
+\label{scheme}
+\caption{Arhitekturna shema rešitve}
+\end{figure}
 
 \section{Nadzorni proces}
 Nadzorni proces za izvajanje dApijev skrbi za:
@@ -632,24 +651,48 @@ Nadzorni proces za izvajanje dApijev skrbi za:
 	\item zagon, zaustavitev in upravljanje storitev
 \end{itemize}
 
-Komunikacija z nadzornim procesom trenutno poteka preko REST zahtevkov, v načrtu pa je podpora za konzolni način upravljanja ter
-podpora novejšim komunikacijsim protokolom, kot so gRPC, Apache Trift in podobni.
+Komunikacija z nadzornim procesom trenutno poteka preko REST aplikacijskega vmesnika, v načrtu pa je implementacija vmesnikov za konzolni nadzor ter podpora novejšim komunikacijsim protokolom kot so gRPC, Apache Trift in podobni.
 
 Za registracijo nove storitve nadzornemu procesu podamo pot do slike vsebnika Docker.
-Sistem poskrbi za distribucijo slike v omrežje IPFS in storitev registrira.
-Storitev je ob registraciji dosegljiva vsem sodelujočim, ki so o pojavu nove storitve tudi obveščeni preko sistema 
-dogodkov.
+Sistem poskrbi za distribucijo slike v omrežje IPFS in podatke o storitvi doda v shrambo pametne pogodbe na Ethereum omrežju.
+Ob uspešni registraciji se proži dogodek, ki sodelujoče entitete obvesti o novi storitvi, pripravljeni na izvajanje.
 
-\section{dApi}
-Implementacijo decentraliziranih APIjev (dAPI) želimo poenostaviti in pripraviti rešitev, ki bo za uporabnika transparentna.
-Standardno KumuluzEE aplikacijo se z razširitvijo \textit{kumuluz-dapi} enostavno opremi z dodatnimi anotacijami in dopolnitvami
-v konfiguracijski datoteki, s tem pa je storitev pripravljena na registracijo v omrežju.
-Ob zagonu storitve se le-ta registrira v omrežje.
-V glavno knjigo zabeleži, katera storitev se izvaja, kdo jo izvaja, na katerem naslovu je storitev dosegljiva ter način oziroma tip komunikacije.
+\begin{lstlisting}
+dapi-manager:
+  storage:
+    remote:
+      type: ipfs
+      location: /ip4/127.0.0.1/tcp/5001
+    local:
+      downloadFolder: download
+      execution:
+  managers:
+  - type: docker
+    connection: tcp://192.168.99.100:2376
+    tls: true
+    certificate-path: /path/to/certificate
+    instance-limit: 10
+  blockchain:
+    provider: ethereum
+    host: http://127.0.0.1:8545
+    account: /path/to/wallet
+    password: password
 
-Odkrivanje storitev poteka preko branja trenutnega stanja glavne knjige, iz katere pridobimo naslov, kjer se željena storitev izvaja.
+\end{lstlisting}
+
+\section{Razširitev KumuluzEE platforme za podporo decentraliziranim aplikacijam}
+
+\subsection{Priprava aplikacije}
+V standardno KumuluzEE aplikacijo je potrebno vključiti razširitev \textit{kumuluz-dapi}. 
+Razširitev ponuja nabor anotacij, s katerimi storitev bodisi registriramo v omrežje, bodisi določeno storitev poiščemo.
+Potrebna je še dopolnitev konfiguracijske datoteke, v kateri podamo dodatne informacije o naši storitvi.
+Ob zagonu storitve se le-ta preko anotacij samodejno registrira v omrežje.
+V glavno knjigo se zapišejo podatki o izvajani storitvi, izvajalcu, naslov, na katerem je storitev dostopna ter aplikacijski vmesnik izvajane storitve.
+
+Za odkrivanje storitev poskrbi razširitev, ki v glavni knjigi poišče izvajalce storitve, med njimi pa na podlagi izbranega algoritma za razporejanje bremena, izbere enega izmed izvajalcev. O izbranem izvajacu v glavni knjigi pridobi podatke o trenutnem naslovu, s tem pa je postopek odkrivanja končan.
 
 Razširitev obstoječe KumuluzEE konfiguracijske datoteke:
+
 
 TODO: Implementacija predlaganih konceptov (Proof of concept). Pravilnost delovanja, dosežki, pregled in uteževanje rezultatov.
 
