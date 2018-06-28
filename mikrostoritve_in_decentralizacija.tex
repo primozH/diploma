@@ -402,6 +402,25 @@ Arhitektura mikrostoritev omogoča...
 \section{Vzorci}
 
 \subsection{Metrike}
+
+Posamezna storitev se lahko izvaja na različnih (fizičnih) lokacijah, na različni strojni opremi in v več instancah.
+Pojavi se potreba po spremljanju storitve in njenega obnašanja, kje in zakaj prihaja do izpadov oziroma morebitnih dolgih odzivnih časih.
+Vse želene metrike želimo shraniti na enem centraliziranem sistemu, jih po možnosti agregirati, in tako omogočiti odkrivanje napak in reševanje teh.
+V osnovi poznamo dva modela zbiranja metrik: 
+\begin{itemize}
+	\item mikrostoritev sama pošilja metrike centralni zbirki (push)
+	\item centralna zbirka zahteva metrike od storitve (pull)
+\end{itemize}
+
+Zbiranje metrik ponuja dober vpogled v obnašanje posameznih storitev, s sabo pa prinese dodatno potrebno infrastrukturo in dodatne težave pri implementaciji.\cite{ApplicationMetrics}
+
+
+Ena izmed bolj znanih storitev za zbiranje aplikacijsih metrik je Prometheus, odprtokodna zbirka orodij za zbiranje in agregiranje metrik ter obveščanje.
+Projekt je bil, takoj za orkestracijskim okoljem Kubernetes, pridružen fundaciji CNCF.
+Prometheus zahteva metrike od storitve (način pull), jih agregira in proži morebitna opozorila.
+Skupaj z ogrodjem Grafana omogoča celovit grafičen vpogled v zbrane metrike. \cite{Prometheus}
+
+
 \subsection{Preverjanje (Health Check)}
 \subsection{Odkrivanje storitev (Service discovery)}
 \subsection{Odpornost na napake (Fault Tolerance)}
@@ -429,9 +448,13 @@ Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe". \cite{hyperledgerDocs}
 To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije.\\
 
-\textbf{TODO:} dopolni s podrobnostmi
-
 \section{Razlaga osnovnih konceptov}
+
+\subsection{Glavna knjiga}
+
+\subsection{Pametne pogodbe}
+
+\subsection{Soglasje}
 
 \subsection{Izvajalna okolja glede na zaupanje med udeleženci}
 V grobem lahko, glede na stopnjo zaupanja, ločimo dva tipa izvajalnih okolij, ki ga udeleženci delijo med seboj.
@@ -581,8 +604,10 @@ Slednje prinaša potencialno velike performančne prihranke.
 
 \textbf{TODO:} dopolni s podrobnostmi
 
-\chapter{Koncepti registracije in odkrivanja storitev v decentraliziranem okolju}
+\chapter{Decentralizirano izvajanje}
 \label{ch4}
+
+\section{Registracija in odkrivanje storitev v decentraliziranem okolju}
 
 Izvajanje storitev se danes seli v oblak, kjer se posamezne instance storitve replicira glede na trenutne potrebe.
 
@@ -634,7 +659,7 @@ TODO: Opis predlaganega koncepta za registracijo in odkrivanje storitev s pametn
 
 Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 
-\chapter{Implementacija in validacija rešitve}
+\chapter{Implementacija in evalvacija rešitve}
 \label{ch5}
 
 \begin{figure}[h]
@@ -642,6 +667,12 @@ Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 \label{scheme}
 \caption{Arhitekturna shema rešitve}
 \end{figure}
+
+Na sliki \ref{scheme} je prikazana shema predlagane rešitve. Osrednji del omrežja je nadzorni proces - 
+dApi manager, ki dostopa do glavne knjige, decentralizirane shrambe in upravlja s storitvami, ki jih gostitelj izvaja.
+Gostiteljski sistem v trenutni različici podpira upravljanje z vsebniki Docker.
+Storitve, ki so na voljo za izvajanje so shranjene na datotečni shrambi IPFS, podatkovna veriga je 
+osnovana na Ethereum verigi. Posamezne komponente sistema so podrobneje opisane v nadaljevanju.
 
 \section{Nadzorni proces}
 Nadzorni proces za izvajanje dApijev skrbi za:
@@ -654,8 +685,14 @@ Nadzorni proces za izvajanje dApijev skrbi za:
 Komunikacija z nadzornim procesom trenutno poteka preko REST aplikacijskega vmesnika, v načrtu pa je implementacija vmesnikov za konzolni nadzor ter podpora novejšim komunikacijsim protokolom kot so gRPC, Apache Trift in podobni.
 
 Za registracijo nove storitve nadzornemu procesu podamo pot do slike vsebnika Docker.
-Sistem poskrbi za distribucijo slike v omrežje IPFS in podatke o storitvi doda v shrambo pametne pogodbe na Ethereum omrežju.
+Sistem poskrbi za distribucijo slike v omrežje IPFS in podatke o storitvi doda v shrambo pogodbe na Ethereum omrežju.
 Ob uspešni registraciji se proži dogodek, ki sodelujoče entitete obvesti o novi storitvi, pripravljeni na izvajanje.
+Te se lahko na dogodek lahko odzovejo z zahtevo za izvajanje storitve.
+Trenutno je izvajanje nove storitve potrebno prožiti ročno, ko bo pripravljen modul za razporejanje opravil, bo postopek v celoti avtomatiziran.
+Pred pričetkom izvajanje se želeno storitev pridobi iz omrežja (IPFS), sliko vsebnika naloži v izvajalno okolje Docker in proži izvajanje.
+Storitev nato sama poskrbi za registracijo in odkrivanje ostalih storitev v omrežju.
+
+Razširitev obstoječe KumuluzEE konfiguracijske datoteke:
 
 \begin{lstlisting}
 dapi-manager:
@@ -677,8 +714,27 @@ dapi-manager:
     host: http://127.0.0.1:8545
     account: /path/to/wallet
     password: password
-
 \end{lstlisting}
+
+\section{Decentralizirana shramba}
+Izvršljive datoteke oziroma slike vsebnikov storitve je potrebno shraniti na način in lokacijo, kjer bodo dostopne vsem sodelujočim entitetam v omrežju.
+Podobno, kot želimo izvajanje storitev decentralizirati, moramo poskrbeti tudi za decentralizirano shrambo.
+V svoji implementaciji sem uporabil decentralizirano shrambo IPFS.
+Gre za projekt, osnovan na omrežju Ethereum, namen projekta pa je shranjevanje datotek v porazdeljeni shrambi, dostop do njih pa preko omrežji P2P, podobno kot deluje protokol BitTorrent, po katerem se projekt tudi zgleduje.
+Vsako datoteko, ki jo želimo shraniti v omrežje, odjemalec razbije na podatkovne bloke, izračuna zgoščeno vrednost posameznega bloka, te vrednosti pa nato sestavi v strukturo imenovano Merkle Tree.
+Datoteko pridobimo enostavno preko zgoščene vrednosti v korenu drevesa.
+Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, vsebino posameznega pa hitro preveri z izračunom zgoščene vrednosti. V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, če sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična zahtevnani. \cite{Ipfs}
+
+\section{Odjemalec za Ethereum omrežje}
+Sistem za delovanje potrebuje odjemalca, ki se zna povezati v Ethereum omrežje.
+V moji testni postavitvi je mesto odjemalca prevzel program Geth, implementacija Ethereum protokola v programskem jeziku Go. \cite{Geth}
+Nadzorni proces se preko JSON RPC povezuje na lokalno instanco odjemalca Geth, decentralizirane storitve v izvajalnem okolju Docker pa se 
+povezujejo na proces, dostopen preko mreže Infura.
+Infura nam omogoča enostaven dostop do Ethereum omrežja, brez potrebe po lokalnem izvajanju Ehtereum protokola.
+Za sodelovanje v decentraliziranem svetu nam lokalno ni potrebno namestiti ničesar, prav tako nam ni potrebno hraniti
+celotne zgodovine - podatkovne verige. 
+Na spletni strani se enostavno registriramo, s tem pridobimo unikaten ključ, ki nam omogoča dostop do oddaljenega izvajalca. \cite{Infura}
+
 
 \section{Razširitev KumuluzEE platforme za podporo decentraliziranim aplikacijam}
 
@@ -686,21 +742,65 @@ dapi-manager:
 V standardno KumuluzEE aplikacijo je potrebno vključiti razširitev \textit{kumuluz-dapi}. 
 Razširitev ponuja nabor anotacij, s katerimi storitev bodisi registriramo v omrežje, bodisi določeno storitev poiščemo.
 Potrebna je še dopolnitev konfiguracijske datoteke, v kateri podamo dodatne informacije o naši storitvi.
-Ob zagonu storitve se le-ta preko anotacij samodejno registrira v omrežje.
-V glavno knjigo se zapišejo podatki o izvajani storitvi, izvajalcu, naslov, na katerem je storitev dostopna ter aplikacijski vmesnik izvajane storitve.
+Ob zagonu storitve se preko anotacij poišče in registrira v omrežje.
+V glavno knjigo se zapišejo podatki o izvajani storitvi, izvajalcu ter naslov, na katerem je storitev dostopna.
 
-Za odkrivanje storitev poskrbi razširitev, ki v glavni knjigi poišče izvajalce storitve, med njimi pa na podlagi izbranega algoritma za razporejanje bremena, izbere enega izmed izvajalcev. O izbranem izvajacu v glavni knjigi pridobi podatke o trenutnem naslovu, s tem pa je postopek odkrivanja končan.
+Za odkrivanje storitev poskrbi razširitev, ki v glavni knjigi poišče izvajalce storitve, med njimi pa na podlagi izbranega algoritma za razporejanje bremena, izbere enega izmed izvajalcev in pridobi naslov, na katerem se storitev trenutno izvaja.
 
 Razširitev obstoječe KumuluzEE konfiguracijske datoteke:
+\begin{lstlisting}
+  dapi:
+    blockchain:
+      host: naslov izvajalca
+      account: /pot/do/datoteke
+      password: geslo
+    type: docker
+    storage: ipfs
+    api: rest
+\end{lstlisting}
+
+V konfiguraciji so predvidene tudi trenutno neuporabljene nastavitve za tip izvršljive datoteke, v kateri shrambi se storitev nahaja in tip aplikacijskega vmesnika.
+Trenutno sistem podpira le vsebnike Docker, ki jih je moč pridobiti preko omrežja IPFS, aplikacijski vmesnik pa je REST.
 
 
-TODO: Implementacija predlaganih konceptov (Proof of concept). Pravilnost delovanja, dosežki, pregled in uteževanje rezultatov.
+\section{Demo aplikacija}
 
-Predvidoma do konca junija. Trenutno v fazi koncepta in prototipiranja.
+Za namene demonstracije delovanja sistema sem implementiral dve preprosti REST storitvi.
+Prva se ob zagonu registrira kot izvajalec, druga ob zagonu poišče prvo in nam ob klicu storitve le posreduje podatke, ki jih pridobi od prve.
+Storitev ki se registrira v omrežje ima le eno izpostavljeno točko - seznam vseh uporabnikov.
+Podobno velja za drugo, ki prvo storitev kliče in nam podatke samo posreduje naprej.
 
+
+\section{Pomankljivosti trenutnega sistema in izboljšave v prihodnosti}
+
+Implementirana rešitev je preprost dokaz zamišljenega koncepta in kot prva različica ponuja kar nekaj možnosti za izboljšave.
+Prva izmed pomankljivosti je sama cena registracije in deregistracije storitev in njihovih izvajalcev.
+Vsaka registracija novega izvajalca pomeni nov zapis na podatkovno verigo, kar v dinamičnem sistemu in ob trenutnih cenah transakcije na Ethereum omrežju predstavlja potencialno veliko finančno breme za izvajalca.
+Zahtevnejša od prve je druga pomankljivost sistema in sicer deregistracija izvajalca.
+Brisanje podatkov iz podatkovne verige je nemogoče zaradi same zasnove tehnologije - nespremenljivost.
+S transakcijo je možno le navidezno brisati - razveljaviti preteklo transakcijo, zapis pa na podatkovni verigi ostane.
+Brisanje je prav tako razmeroma draga operacija, posebno velik problem predstavlja brisanje izvajalca in s tem posledično še deregistracijo vseh storitev, ki jih je ta izvajalec v trenutku prekinitve izvajanja izvajal.
+
+Dodatni mehanizmi, ki jih poznajo obstoječi sistemi za odkrivanje storitev, so še samodejna deregistracija storitve ob vnaprej določenem pretečenem času neaktivnosti.
+Trenutna implementacija tega mehanizma še ne pozna, problem predstavlja predvsem decentralizacija.
+V tem sistemu ne poznamo centralne storitve, ki bi ob določenem času iz registra preprosto brisala vse neaktivne storitve.
+Sistem potrebuje nov mehanizem, ki bo znal med storitvami poiskati neaktivne in jih odstraniti iz registra. Kakšen bo mehanizem in princip delovanja sta v tem trenutku neznanka.
+
+Sistem potrebuje tudi način prerazporejanja zahtev po omrežju.
+Kdo izmed trenutno registriranih izvajalcev bo lahko najhitreje odgovoril?
+Hiter odgovor je pogojen s fizično oddaljenostjo gostitelja od izvajalca, omrežnimi zakasnitvami, hitrost samega izvajalca. Reševanje teh izzivov je naslednja v vrsti, ki jih predstavlja celostna postavitev, v praksi uporabnega, sistema.
+
+
+Vsakega izvajalca storitve želimo za uspešno izveden klic ustrezno finančno nagraditi. Tu se poraja več vrst odprtih vprašanj, izstopa predvsem vprašanje finančne vrednosti posameznega klica in način preverjanja pravilnosti izvedbe klica.
+Je izvajalec dejansko pravilno izvedel zahtevano dejanje, tako kot je predvidel razvijalec in naročnik?
+Potreben je mehanizem, ki ga zaenkrat imenujmo \sn{Proof of Execution}.
+Podobno kot trenutni mehanizmi \sn{Proof of Work}, \sn{Proof of Stake} ter sorodni, ki jih uporabjajo decentralizirane podatkovne verige, potrebujemo mehanizem, preko katerega se bodo sodelujoče entitete v omrežju sposobne odločiti, ali je določen izvajalec pravilno izvedel zahtevano dejanje.
+S tem področjem se trenutno aktivno ukvarjajo tudi pri startupu SONM, ki objublja računsko moč na zahtevo v decentraliziranem okolju. Iz oblačnega računalništva želijo preiti na t.i. \sn{računalniške storitve v megli} (fog computing). \cite{Sonm}
 
 \chapter{Zaključek}
 \label{stroka}
+
+Proof of Execution, Scheduling, naročila izvajanja in potek avkcij
 \textbf{TODO:} Glavne ugotovitve, povzetek narejenega. Kratka evalvacija.
 
 Napisan ob zaključku dela.
