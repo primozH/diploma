@@ -397,7 +397,43 @@ Proces sprotne dostave (Continouos Delivery) je otežen, za posodobitev enega de
 
 \section{Arhitektura mikrostoritev}
 
-Arhitektura mikrostoritev omogoča...
+Gradnja aplikacij je do nedavnega potekala na način, da so razvijalci vse odvisnosti in logiko, potrebno za delovanje, zložili skupaj v veliko tvorbo - monolit.
+Tak način gradnje ima svoje prednosti in slabosti.
+Prednosti na eni strani predstavljajo enostavna zgradba aplikacije, ker je vsa izvorna koda zbrana na enem mestu.
+Orodja za razvoj so prilagojena takemu načinu dela in razvijalcu ponujajo širok nabor funkcij, ki podpirajo celotno življenjko pot aplikacije, od razvoja, testiranja, namestitve v testna in produkcijska okolja ter vzdrževanje.
+Velikost projekta je na drugi strani ena od slabosti monolitov, majhne spremembe enega sestavnega dela potrebujejo ponovno namestitev celotne aplikacije.
+Skaliranje poteka vertikalno, le preko ustvarjanja novih instanc celotne aplikacije.
+Monolitna zasnova aplikacije razvijalce in vzdrževalce zaveže k dolgoročni uporabi tehnologij, ki so bile uporabljene na začetku.
+Kasnejše uveljavljanje novih tehnologij oziroma nadomeščanje obstoječih je časovno in finančno potratno, saj je potrebno celotno logiko aplikacije prepisovati. \cite{monolithMicroservice}
+
+Arhitektura mikrostoritev se problema gradnje aplikacij loti drugače.
+Celotno aplikacijo se logično razbije na posamezne sestavne dele, ki se izvajajo samostojno in se med seboj povezujejo preko lahkih komunikacijskih protokolov.
+Vsak sestavni del aplikacije je samostojen v smislu skaliranja, življenjske dobe posamezne instance, razvoja in podpornih tehnologij.
+Tak način gradnje sledi tistemu, ki ga v fizičnem svetu poznamo že stoletja, to je sestavljanje vnaprej pripravljenih delov v celoto.
+Lep primer tega je avtomobilska industrija.
+Na tekočem traku se na tisoče sestavnih delov različnih proizvajalcev zloži v polno funkcionalno enoto - avtomobil.
+Podobno želimo doseči pri razvoju programske opreme, kar bi pohitrilo in pocenilo razvoj novih aplikacij, krepko pa bi omejili tudi nepotrebno podvajanje izvorne kode. \cite{microservicePattern, microservicesMartin}
+
+V povezavi z mikrostoritvami je tesno povezana tudi arhitektura \sn{cloud-native}.
+Gre za novo paradigmo razvoja programske opreme, ki sledi načinom izdelave stvari v fizičnem svetu.
+Z namenom uveljavljanja in razvoja paradigme je bila ustanovljena \sn{Cloud Native Computing Foundation}, ki bdi nad razvojem standardov in novih smernic.
+Oblačne sisteme sestavljajo \cite{cncf}:
+\begin{itemize}
+	\item Aplikacije in procesi se izvajajo znotraj vsebnikov, ki so neodvisne in izoloirane izvajalne enote
+	\item Storitve so dinačmično upravljajo in nadzorujejo preko centralnega orkestracijskega procesa
+	\item Sistem sestavljajo mikrostoritve, ki so med seboj šibko sklopljene
+\end{itemize}
+
+Računalništvo v oblaku je dostop in uporaba računskih virov (aplikacije, podatkovna skladišča, procesorski čas...) na zahtevo preko interneta.
+Plačilo se izvede skladno s količino porabljenih virov.
+Viri so elastični in zmožni hitrega in učinkovitega skaliranja ter prilagajanja trenutnim zahtevam.
+V grobem med seboj ločimo tri glavne komponente oblačnih sistemov: SaaS, PaaS in IaaS.
+SaaS (Software as a Service) - programska oprema kot storitev, je oblačna aplikacija, ki se izvaja na oddaljenih računalnikih, do katerih uporabnik storitve dostopa preko interneta. 
+Prednosti teh aplikacij so dostopnost od koderkoli, za nemoteno delovanje aplikacije je odgovoren ponudnik in storitev je zmožna dinamičnega skaliranja, da zadovolji trenutnim potrebam.
+PaaS (Platform as a Service) - platforma kot storitev, uporabnikom ponuja programsko platformo, brez stroškov nakupa in kompleksnosti upravljanja podporne strojne in programske opreme.
+IaaS (Infrastructure as a Service) - infrastruktura kot storitev, ponuja dostop do računskih virov (strežniki, omrežna oprema, shramba...).
+Uporabnikom ni potrebno investirati v lastno strojno opremo, tako kot sestrske storitve (SaaS in PaaS), je tudi ta zmožna samodejnega skaliranja. \cite{ibmCloudComputing}
+
 
 \section{Vzorci}
 
@@ -421,8 +457,31 @@ Prometheus zahteva metrike od storitve (način pull), jih agregira in proži mor
 Skupaj z ogrodjem Grafana omogoča celovit grafičen vpogled v zbrane metrike. \cite{Prometheus}
 
 
-\subsection{Preverjanje (Health Check)}
+\subsection{Preverjanje odzivnosti (Health Check)}
+
+Pogosto se zgodi, da se storitev še vedno odziva na posamezne zahteve, vendar so te neuspešne.
+V takšnih primerih je pričakovano obnašanje sistema, da nedelujočo storitev iz omrežja označi kot nedosegljivo in jo nadomesti z novo.
+Tu v igro vstopi koncept preverjanja odzivnosti storitev (ang. Health check), ki za vsako storitev pričakuje izpostavljeno dostopno točko, preko katere lahko sistem pridobi informacije o sposobnosti storitve, da odgovori na zahtevke.
+Vsaka storitev je odgovorna za preverjanje svojih zunanjih in notranjih virov in generiranja poročila o trenutnem statusu posamezne komponente.
+Tipični testi so preverjanje zmožnosti povezave na podatkovno bazo, dosegljivost ostalih odvisnih storitev, povezljivost z vrstami...
+Poleg zunanjih odvisnosti se preveri tudi stanje gostitelja: razpoložljiv prostor na disku, zasedenost CPE ipd.
+Nadzorna storitev periodično proži zahteve na vse registrirane storitve in preverja njihove odzive.
+Tipičen ukrep ob negativnem odzivu je zaustavitev in ponovni zagon nedelujoče storitve. \cite{healthCheck}
+
 \subsection{Odkrivanje storitev (Service discovery)}
+
+Ko želimo od zunanje entitete pridobiti podatke oziroma prožiti določeno akcijo, potrebujemo njen omrežni naslov (kombinacija naslova IP in številke vrat).
+Pri klasičnih aplikacijah, ki se izvajajo na fizični napravi, so naslovi relativno statični.
+Zelo malo je tudi klicev med posameznimi aplikacijami, saj se storitve med seboj kličejo preko programskih klicev.
+V arhitekturi mikrostoritev je omrežnih klicev bistveno več, ker je celotna programska logika aplikacije sestavljena iz več samostojnih storitev.
+Njihovo število se dinamično spreminja, skladno s tem tudi omrežni naslovi posameznih instanc.
+Posledično je potrebno za odjemalca vpeljati nov mehanizem, ki je zmožen dinamično odkriti naslove, na katerih se želena storitev nahaja.
+
+Tipično za oblačne arhitekture je, da se odkrivanje storitev realizira s pomočjo centralnega registra.
+Storitve se ob pričetku izvajanja registrirajo.
+Odjemalska aplikacija ob potrebi po dostopu do zunanje storitve na register naslovi poizvedbo za lokacijo instanc želene mikrostoritve.
+Zakasnitev pri omrežnih klicih je bistveno večja kot pri programskih klicih znotraj aplikacije, zato želimo visoko učinkovitost poizvedb. \cite{serviceDiscovery, maldip}
+
 \subsection{Odpornost na napake (Fault Tolerance)}
 
 \section{Vsebniki in orkestracija}
@@ -430,7 +489,7 @@ Skupaj z ogrodjem Grafana omogoča celovit grafičen vpogled v zbrane metrike. \
 \textbf{TODO:} dopolni s podrobnostmi (1. in 2. teden v juniju).
 
 
- \chapter{Tehnologija veriženja podatkovnih blokov}
+\chapter{Tehnologija veriženja podatkovnih blokov}
 \label{ch2}
 
 Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s konsenzom, sistemom "pametnih" pogodb ter drugih pomožnih tehnologij \cite{hyperledgerWeb}. Osrednja komponenta sistema je glavna knjiga (ang. ledger), ki beleži vse akcije (transakcije), izvedene na omrežju. \cite{hyperledgerDocs}
@@ -659,7 +718,7 @@ TODO: Opis predlaganega koncepta za registracijo in odkrivanje storitev s pametn
 
 Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 
-\chapter{Implementacija in evalvacija rešitve}
+\chapter{Implementacija predlagane rešitve}
 \label{ch5}
 
 \begin{figure}[h]
@@ -723,7 +782,7 @@ V svoji implementaciji sem uporabil decentralizirano shrambo IPFS.
 Gre za projekt, osnovan na omrežju Ethereum, namen projekta pa je shranjevanje datotek v porazdeljeni shrambi, dostop do njih pa preko omrežji P2P, podobno kot deluje protokol BitTorrent, po katerem se projekt tudi zgleduje.
 Vsako datoteko, ki jo želimo shraniti v omrežje, odjemalec razbije na podatkovne bloke, izračuna zgoščeno vrednost posameznega bloka, te vrednosti pa nato sestavi v strukturo imenovano Merkle Tree.
 Datoteko pridobimo enostavno preko zgoščene vrednosti v korenu drevesa.
-Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, vsebino posameznega pa hitro preveri z izračunom zgoščene vrednosti. V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, če sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična zahtevnani. \cite{Ipfs}
+Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, vsebino posameznega pa hitro preveri z izračunom zgoščene vrednosti. V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, če sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična zahtevani. \cite{Ipfs}
 
 \section{Odjemalec za Ethereum omrežje}
 Sistem za delovanje potrebuje odjemalca, ki se zna povezati v Ethereum omrežje.
@@ -734,6 +793,8 @@ Infura nam omogoča enostaven dostop do Ethereum omrežja, brez potrebe po lokal
 Za sodelovanje v decentraliziranem svetu nam lokalno ni potrebno namestiti ničesar, prav tako nam ni potrebno hraniti
 celotne zgodovine - podatkovne verige. 
 Na spletni strani se enostavno registriramo, s tem pridobimo unikaten ključ, ki nam omogoča dostop do oddaljenega izvajalca. \cite{Infura}
+
+\section{Implementacija pametne pogodbe}
 
 
 \section{Razširitev KumuluzEE platforme za podporo decentraliziranim aplikacijam}
@@ -763,6 +824,8 @@ V konfiguraciji so predvidene tudi trenutno neuporabljene nastavitve za tip izvr
 Trenutno sistem podpira le vsebnike Docker, ki jih je moč pridobiti preko omrežja IPFS, aplikacijski vmesnik pa je REST.
 
 
+\chapter{Delovanje in evalvacija}
+
 \section{Demo aplikacija}
 
 Za namene demonstracije delovanja sistema sem implementiral dve preprosti REST storitvi.
@@ -770,10 +833,9 @@ Prva se ob zagonu registrira kot izvajalec, druga ob zagonu poišče prvo in nam
 Storitev ki se registrira v omrežje ima le eno izpostavljeno točko - seznam vseh uporabnikov.
 Podobno velja za drugo, ki prvo storitev kliče in nam podatke samo posreduje naprej.
 
-
 \section{Pomankljivosti trenutnega sistema in izboljšave v prihodnosti}
 
-Implementirana rešitev je preprost dokaz zamišljenega koncepta in kot prva različica ponuja kar nekaj možnosti za izboljšave.
+Prva različica sistema ponuja kar nekaj možnosti za izboljšave.
 Prva izmed pomankljivosti je sama cena registracije in deregistracije storitev in njihovih izvajalcev.
 Vsaka registracija novega izvajalca pomeni nov zapis na podatkovno verigo, kar v dinamičnem sistemu in ob trenutnih cenah transakcije na Ethereum omrežju predstavlja potencialno veliko finančno breme za izvajalca.
 Zahtevnejša od prve je druga pomankljivost sistema in sicer deregistracija izvajalca.
