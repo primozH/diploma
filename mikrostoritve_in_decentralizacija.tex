@@ -255,7 +255,7 @@ Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega
 % zahvala
 \thispagestyle{empty}\mbox{}\vfill\null\it%
 \noindent
-Na tem mestu zapišite, komu se zahvaljujete za izdelavo diplomske naloge. Pazite, da ne boste koga pozabili. Utegnil vam bo zameriti. Temu se da izogniti tako, da celotno zahvalo izpustite.
+Zahvaljujem se prof. Matjažu B. Juriču za podporo in usmeritve pri pripravi diplomskega dela. Posebna zahvala gre mojim staršem, bratom, sestram, starim staršem in prijateljem, ki mi vedno stojijo ob strani in me pri mojem delu podpirajo.
 \rm\normalfont
 
 % prazna stran
@@ -285,7 +285,6 @@ Posvetilo
 % seznam kratic
 
 \chapter*{Seznam uporabljenih kratic}  % spremenil Solina, da predolge vrstice ne gredo preko desnega roba
-\textbf{TODO:} dopolni
 
 \begin{comment}
 \begin{tabular}{l|l|l}
@@ -294,15 +293,20 @@ Posvetilo
   {\bf CA} & classification accuracy & klasifikacijska točnost \\
   {\bf DBMS} & database management system & sistem za upravljanje podatkovnih baz \\
   {\bf SVM} & support vector machine & metoda podpornih vektorjev \\
-  \dots & \dots & \dots \\
 \end{tabular}
 \end{comment}
 
 \noindent\begin{tabular}{p{0.1\textwidth}|p{.4\textwidth}|p{.4\textwidth}}    % po potrebi razširi prvo kolono tabele na račun drugih dveh!
   {\bf kratica} & {\bf angleško}                             & {\bf slovensko} \\ \hline
-  {\bf CA}      & classification accuracy               & klasifikacijska točnost \\
-  {\bf DBMS} & database management system & sistem za upravljanje podatkovnih baz \\
-  {\bf SVM}   & support vector machine              & metoda podpornih vektorjev \\
+  {\bf API}      & application programming interface & aplikacijski programski vmesnik \\
+  {\bf PoW} & Proof-of-Work & Dokaz o opravljenem delu \\
+  {\bf DBMS}   & Database Management System & Sistem za upravljanje podatkovne baze \\
+  {\bf IPFS} & Interplanetary File System & Medplanetarni datotečni sistem \\
+  {\bf REST} & Representational state transfer & - \\
+  {\bf GKE} & Google Kontainer Engine & - \\
+  {\bf AWS} & Amazon Web Services & - \\
+  {\bf DOS} & Denial of Service & Zavrnitev storitve \\
+  {\bf CNCF} & Cloud Native Computing Foundation & - \\
   \dots & \dots & \dots \\
 \end{tabular}
 
@@ -481,8 +485,6 @@ Tipično za oblačne arhitekture je, da se odkrivanje storitev realizira s pomo�
 Storitve se ob pričetku izvajanja registrirajo.
 Odjemalska aplikacija ob potrebi po dostopu do zunanje storitve na register naslovi poizvedbo za lokacijo instanc želene mikrostoritve.
 Zakasnitev pri omrežnih klicih je bistveno večja kot pri programskih klicih znotraj aplikacije, zato želimo visoko učinkovitost poizvedb. \cite{serviceDiscovery, maldip}
-
-\subsection{Odpornost na napake (Fault Tolerance)}
 
 \section{Vsebniki in orkestracija}
 
@@ -790,11 +792,102 @@ V moji testni postavitvi je mesto odjemalca prevzel program Geth, implementacija
 Nadzorni proces se preko JSON RPC povezuje na lokalno instanco odjemalca Geth, decentralizirane storitve v izvajalnem okolju Docker pa se 
 povezujejo na proces, dostopen preko mreže Infura.
 Infura nam omogoča enostaven dostop do Ethereum omrežja, brez potrebe po lokalnem izvajanju Ehtereum protokola.
-Za sodelovanje v decentraliziranem svetu nam lokalno ni potrebno namestiti ničesar, prav tako nam ni potrebno hraniti
-celotne zgodovine - podatkovne verige. 
+Za sodelovanje v Ethereum omrežju nam tako lokalno ni potrebno namestiti ničesar, prav tako nam ni potrebno hraniti
+celotne zgodovine podatkovne verige. 
 Na spletni strani se enostavno registriramo, s tem pridobimo unikaten ključ, ki nam omogoča dostop do oddaljenega izvajalca. \cite{Infura}
 
 \section{Implementacija pametne pogodbe}
+Pametna pogodba, ki predstavlja register storitev in osrednji del sistema, je napisana v programskem jeziku Solidity.
+Solidity je jezik, v katerem ustvarjalci Ethereum omrežja priporočajo implementacije pametnih pogodb.
+Je visoko nivojski jezik, precej podoben JavaScriptu in namenjen izvajanju na navideznem stroju Ethereum (EVM).
+Med konstrukti jezika najdemo dedovanje, knjižnice, uporabniško določene tipe in ostale visokonivojske konstrukte.
+Namensko orodje za razvoj pametnih pogodb je trenutno le eno, poznano pod imenom Remix, dostopno pa je tudi v spletni različici.
+\cite{solidityDocs}
+
+Osnovni konstrukti zasnovane pogodbe so strukture User, dApi, Worker in Execution.
+
+\begin{lstlisting}
+contract Registry {
+	struct User {
+		string friendlyName;
+		mapping(bytes32 => Worker) workers;
+		mapping(bytes32 => dApi) dApis;
+	}
+	
+	struct dApi {
+		string name;
+		string version;
+		string location;
+		bool isValid;
+	}
+	
+	struct Worker {
+		string name;
+		bytes32 workerId;
+		bool isValid;
+	}
+	
+	struct Execution {
+		Worker worker;
+		string location;
+		bool active;
+	}
+	
+ 	/// MAPPINGS
+	mapping (address => User) users;
+	mapping (bytes32 => Execution[]) dAPIExecutors;
+	...
+\end{lstlisting}
+
+Struktura \textbf{User} predstavlja ponudnika decentraliziranih aplikacij.
+Vsakemu ponudniku pripada seznam izvajalcev (workers) in objavljenih APIjev (dApis).
+O posamezni storitvi hranimo ime, verzijo ter lokacijo, ki v našem primeru predstavlja zgoščeno vrednost korena slike Docker, shranjene na IPFS.
+Vsak izvajalec je samostjona enota, ki je zadolžena za izvajanje aplikacije, struktura Execution, v navezavi z mapiranjem \textit{dAPIExecutors} pa povezuje aplikacijo z njenimi izvajalci in naslovu, preko katerega je dostopna.
+
+Registracija poteka v več korakih, najprej je potrebno registrirati ponudnika storitve, nato se samodejno, ob zagonu instance nadzorne storitve, izvede registracija izvajalca.
+Za registracijo storitve poskrbi storitev sama, preko razširitve \textit{Kumuluzee-dapi}, takoj ob zagonu.
+
+\begin{lstlisting}
+function registerApi(string _name,
+	string _version,
+	string _location,
+	bytes32 _hash, bool _isValid) public {
+	dApi memory dapi = dApi(
+	_name,
+	_version,
+	_location,
+	_isValid
+	);
+	
+	users[msg.sender].dApis[_hash] = dapi;
+	emit dAPIPublished(_name, _version, msg.sender,
+	_hash);
+}
+...
+\end{lstlisting}
+
+Proces deregistracije izvajanja storitve je kompleksnejši postopek, ki zahteva kar nekaj računskega dela.
+Dokler je v sistemu malo registriranih izvajalnih enot je deregistracija dokaj neopazna, tako z vidika časa in cene.
+Problem nastopi v primeru velikega števila izvajalnih enot.
+Na testnem omrežju \textit{Rinkeby} sem ob testiranju večjega števila registrianih izvajalnih enot presegel omejitev računskih korakov na transakcijo (gas).
+
+\begin{lstlisting}
+function deregisterExecution(bytes32 _apiHash, 
+uint _wIndex) public {
+	if (_wIndex >= dAPIExecutors[_apiHash].length)
+		return;
+	
+	for (uint i = _wIndex;
+	i<dAPIExecutors[_apiHash].length-1; i++){
+		dAPIExecutors[_apiHash][i]=
+			dAPIExecutors[_apiHash][i+1];
+	}
+	dAPIExecutors[_apiHash].length--;
+}
+\end{lstlisting}
+
+Še večji problem nastopi ob deregistraciji izvajalca, tu bi bilo potrebno iterirati preko vseh registriranih storitev in poiskati izvajalca za brisanje.
+Ta del registra še ni implementiran in potrebuje dodatno pozornost v prihodnje.
 
 
 \section{Razširitev KumuluzEE platforme za podporo decentraliziranim aplikacijam}
@@ -858,6 +951,19 @@ Je izvajalec dejansko pravilno izvedel zahtevano dejanje, tako kot je predvidel 
 Potreben je mehanizem, ki ga zaenkrat imenujmo \sn{Proof of Execution}.
 Podobno kot trenutni mehanizmi \sn{Proof of Work}, \sn{Proof of Stake} ter sorodni, ki jih uporabjajo decentralizirane podatkovne verige, potrebujemo mehanizem, preko katerega se bodo sodelujoče entitete v omrežju sposobne odločiti, ali je določen izvajalec pravilno izvedel zahtevano dejanje.
 S tem področjem se trenutno aktivno ukvarjajo tudi pri startupu SONM, ki objublja računsko moč na zahtevo v decentraliziranem okolju. Iz oblačnega računalništva želijo preiti na t.i. \sn{računalniške storitve v megli} (fog computing). \cite{Sonm}
+
+Za podporo načrtovanemu sistemu je v prihodnje potrebno razviti tudi lastno podatkovno verigo.
+Podatkovna veriga bi morala omogočati hitro potrjevanje transakcij, ki so podporna veja registra storitev.
+Optimizirati bi bilo potrebno računsko zahtevnost danih operacij, oziroma omejiti izvajanje pametnih pogodb le na podmnožico entitet v omrežju, funckionalnost, podobna tisti v sistemu HyperLedger Fabric.
+Omrežje najverjetneje potrebuje tudi učinkovitejši algoritem za dosego konsenza.
+Proof of Work tu odpove, oziroma predstavlja preveliko časovno in finančno potratnost.
+
+Sistem bi za praktično uporabo potreboval tudi učinkovit način za izvedbo finančnih transakcij ob uspešno izvedenem klicu.
+V arhitekturi mikrostoritev se klice storitev največkrat preusmerja preko aplikacijsih prehodov (API gateway).
+Ti zbirajo določene statistične parametre o klicih in, na podlagi vnaprej definiranih finančnih politik, zaračunajo uporabo.
+Ideja pri decentraliziranem sistemu je ob uspešnem klicu samodejno izvesti finančno transakcijo, ter centraliziran prehod nadomestiti s popolnoma decentralizirano logiko.
+Način, kako to izvesti je zaenkrat še neznanka in bo stvar prihodnjih raziskav.
+
 
 \chapter{Zaključek}
 \label{stroka}
