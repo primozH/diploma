@@ -45,7 +45,8 @@
 
 \usepackage{color}       % dodal Solina
 \usepackage{soul}       % dodal Solina
-\usepackage{listings}
+\usepackage{listings}	% dodal Hrovat
+\usepackage{float}		% dodal Hrovat
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	DIPLOMA INFO
@@ -488,7 +489,66 @@ Zakasnitev pri omrežnih klicih je bistveno večja kot pri programskih klicih zn
 
 \section{Vsebniki in orkestracija}
 
-\textbf{TODO:} dopolni s podrobnostmi (1. in 2. teden v juniju).
+Vsebniki danes nadomeščajo virtualne naprave, predvsem na račun bolj učinkovite uporabe sistemskih virov in odpravljanjem nepotrebnih podvajanj programske opreme.
+
+\subsection{Tehnologija vsebnikov}
+Vsebnik je samostojen, izvršljiv skupek programske opreme, ki vsebuje vse potrebne odvisnosti, orodja, knjižnice in nastavitve, potrebne za izvajanje.
+Izvajanje kode znotraj vsebnika bo v vsakem gostiteljskem ogrodju (Windows, Linux, MacOS) enako.
+Notranji deli vsebnika so izolirani od okolice, kar odpravlja morebitne konflikte zaradi različnih verzij potrebnih odvisnosti.
+V primerjavi z navideznimi napravami, vsebniki virtualizirajo operacijski sistem in ne podporne strojne opreme.
+Z gostiteljskim sistemom in ostalimi vsebniki delijo jedro operacijskega sistema, vsak izmed njih v svojem naslovnem prostoru.
+
+Shema \ref{vm_vs_container} prikazuje bistveno razliko med vsebniško tehnologijo in tehnologijo virtualizacije. \cite{dockerContainer}
+
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/vsebniki_vm.png}
+	\label{vm_vs_container}
+	\caption{Primerjava vsebnikov in navideznih naprav}
+\end{figure}
+
+
+\subsection{Orkestracijska oroja}
+
+Proces prenosa in namestitve vsebnikov v izvajalno okolje je moč avtomatizirati.
+Proces postaja pomembnejši, z rastjo števila vsebnikov in gostiteljskih sistemov. 
+Ta tip avtomatizacije poimenujemo orkestracija, ki nam ponuja vrsto funckionalnosti:
+\begin{itemize}
+	\item upravljanje z gostiteljskim sistemom
+	\item instanciranje vsebnikov
+	\item upravljanje z vsebniki
+	\item povezovanje vsebnikov preko vmesnikov
+	\item izpostavljanje storitev zunanjim napravam
+	\item skaliranje gruče vsebnikov
+\end{itemize}
+
+S pojavom in razširitvijo vsebniške tehnologije so se pojavila tudi številna orodja za orkestracijo.
+Med njimi najbolj poznana sta Docker Swarm in Kubernetes.
+Vsako izmed teh orodij orkestracijo rešuje na svoj način, Kubernetes pa je trenutno eno izmed najbolj razširjenih orodij.
+Njegove glavne funckionalnosti so:
+\begin{itemize}
+	\item avtomatizirano nameščanje in repliciranje vsebnikov
+	\item skaliranje
+	\item porazdeljevanje dela (load balancing)
+	\item nameščanje posodobitev
+	\item odpornost na napake in odpovedi vsebnikov z avtomatskimi ponovnimi zagoni
+	\item kontrolirano izpostavljanje notranjega omrežja zunanjim storitvam
+\end{itemize}
+
+Glavni sestavni deli Kubernetesa so: 
+\begin{itemize}
+	\item gruča je zbirka enega ali več strežnikov (ang. Node), ki svoje vire ponujajo nadzornemu procesu
+	\item strok (pod) je skupina vsebnikov in pripradajočih shramb, ki so dodeljene enemu gostitelju. Predstavljajo osnovno celico Kubernetesa, znotraj stroka si procesi delijo lokalni omrežni naslovni prostor.
+	\item oznake so dodeljene posameznim entitetam (vsebnikom), ki omogočajo upravljanje z njimi v skupini
+	\item storitve skrbijo za osnovno dodeljevanje dela in izpostavljajo stroke zunanjemu svetu.
+\end{itemize}
+
+Slika \ref{kubernetes_cluster} prikazuje osnovno shemo Kubernetes gruče.
+
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/kubernetes_cluster.png}
+	\label{kubernetes_cluster}
+	\caption{Kubernetes gruča}
+\end{figure}
 
 
 \chapter{Tehnologija veriženja podatkovnih blokov}
@@ -507,15 +567,40 @@ S temi mehanizmi se zagotovi veljavnost in nespremenljivost podatkov v okolju, k
 Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 
 Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe". \cite{hyperledgerDocs}
-To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije.\\
+To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije.
 
 \section{Razlaga osnovnih konceptov}
 
-\subsection{Glavna knjiga}
+\subsection{Porazdeljena glavna knjiga}
+V osrčju tehnologije podatkovnih blokov je porazdljena glavna knjiga, ki vsebuje zapise o vseh transakcijah, izvedenih na omrežju.
+Glavna knjiga je replicirana na vseh entitetah v omrežju, ki med sabo sodelujejo in skrbijo za vzdrževanje.
+Informacije so v glavno knjigo le dodajajo z uporabo kriptografskih tehnik, ki zagotavljajo, da je vsaka zapisana transakcija trajna in nespremenljiva.
+To omogoča enostavno preverjanje izvora informacije, od tu tudi drugo poimenovanje za tehnologijo podatkovnih blokov kot sistem dokazovanja \cite{hyperledgerDocs}.
+Na sliki \ref{hyperledger_basic_network} je prikazana osnovna shema omrežja.
+
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/basic_network.png}
+	\label{hyperledger_basic_network}
+	\caption{Porazdeljeno omrežje. Vsak uporabnik hrani kopijo glavne knjige \cite{hyperledgerDocs}}.
+\end{figure}
 
 \subsection{Pametne pogodbe}
+Pametne pogodbe omogočajo kontroliran dostop in interakcijo z glavno knjigo.
+So osnovni mehanizem za enkapsulacijo informacij in njihovo preprosto vzdrževanje preko omrežja.
+Poleg tega omogočajo tudi določeno stopnjo avtomatizacije, kot izvrševanje transakcij brez človeškega posredovanja.
+V primerjavi s tradicionalnimi pogodbami, nam pametne pogodbe zagotavljajo višjo stopnjo varnosti in zmanjševanje dodatnih stroškov, ki so povezani z njihovim izvajanjem \cite{atzei2017survey}.
+Na sliki \ref{smart_contract} je prikazan osnovni potek interakcije pametne pogodbe z glavno knjigo.
+
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/Smart_Contract_sl.png}
+	\label{smart_contract}
+	\caption{Interakcija pametne pogodbe z glavno knjigo \cite{hyperledgerDocs}.}
+\end{figure}
+
 
 \subsection{Soglasje}
+
+
 
 \subsection{Izvajalna okolja glede na zaupanje med udeleženci}
 V grobem lahko, glede na stopnjo zaupanja, ločimo dva tipa izvajalnih okolij, ki ga udeleženci delijo med seboj.
@@ -528,7 +613,7 @@ V omrežju lahko sodelujo kdorkoli in to povsem anonimno,
 med udeleženci tako a priori velja načelo nezaupanja.
 Zaupa se le stanju celotne podatkovne verige.
 Tipično so za potrjevanje blokov in novih transakcij uporabljene \sn{kripto valute}, pridobljene s ti. postopkom rudarjenja.
-Ta omrežja večinoma temeljijo na ??? (BFT). \cite{hyperledgerDocs}
+Ta omrežja večinoma temeljijo na Byzantine Fault-Tolerance (BFT) \cite{hyperledgerDocs, castro1999practical}.
 
 \subsection{Zasebnost in zaupnost}
 Javne podatkovne verige so replicirane na vseh sodelujočih entitetah, kar prinaša transparentnost, obenem pa poslovnim subjektom onemogoča učinkovito sklepanje dodatnih ugodnosti, aneksov ipd. s poslovnimi partnerji.
@@ -724,7 +809,7 @@ Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 \label{ch5}
 
 \begin{figure}[h]
-\includegraphics[width=1.0\textwidth]{slike/dApi.png}
+\includegraphics[width=1.0\textwidth]{slike/dApi_sl.png}
 \label{scheme}
 \caption{Arhitekturna shema rešitve}
 \end{figure}
