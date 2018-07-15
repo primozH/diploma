@@ -507,11 +507,11 @@ Shema \ref{vm_vs_container} prikazuje bistveno razliko med vsebniško tehnologij
 \end{figure}
 
 
-\subsection{Orkestracijska oroja}
+\subsection{Orkestracijska orodja}
 
 Proces prenosa in namestitve vsebnikov v izvajalno okolje je moč avtomatizirati.
 Proces postaja pomembnejši, z rastjo števila vsebnikov in gostiteljskih sistemov. 
-Ta tip avtomatizacije poimenujemo orkestracija, ki nam ponuja vrsto funckionalnosti:
+Ta tip avtomatizacije poimenujemo orkestracija, ki nam ponuja vrsto funckionalnosti \cite{mongoKubernetes}:
 \begin{itemize}
 	\item upravljanje z gostiteljskim sistemom
 	\item instanciranje vsebnikov
@@ -534,7 +534,7 @@ Njegove glavne funckionalnosti so:
 	\item kontrolirano izpostavljanje notranjega omrežja zunanjim storitvam
 \end{itemize}
 
-Glavni sestavni deli Kubernetesa so: 
+Glavni sestavni deli Kubernetesa so \cite{mongoKubernetes}: 
 \begin{itemize}
 	\item gruča je zbirka enega ali več strežnikov (ang. Node), ki svoje vire ponujajo nadzornemu procesu
 	\item strok (pod) je skupina vsebnikov in pripradajočih shramb, ki so dodeljene enemu gostitelju. Predstavljajo osnovno celico Kubernetesa, znotraj stroka si procesi delijo lokalni omrežni naslovni prostor.
@@ -547,7 +547,7 @@ Slika \ref{kubernetes_cluster} prikazuje osnovno shemo Kubernetes gruče.
 \begin{figure}[h]
 	\includegraphics[width=1.0\textwidth]{slike/kubernetes_cluster.png}
 	\label{kubernetes_cluster}
-	\caption{Kubernetes gruča}
+	\caption{Kubernetes gruča \cite{kubernetesTutorial}}
 \end{figure}
 
 
@@ -566,8 +566,8 @@ Napad na omrežje je možen le s pridobitvijo več kot polovice vseh sodelujoči
 S temi mehanizmi se zagotovi veljavnost in nespremenljivost podatkov v okolju, ki mu apriori ni potrebno zaupati.
 Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 
-Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe". \cite{hyperledgerDocs}
-To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije.
+Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. "pametne pogodbe".
+To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije \cite{hyperledgerDocs}.
 
 \section{Razlaga osnovnih konceptov}
 
