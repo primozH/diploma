@@ -264,9 +264,9 @@ Zahvaljujem se prof. Matjažu B. Juriču za podporo in usmeritve pri pripravi di
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % posvetilo, če sama zahvala ne zadošča :-)
-\thispagestyle{empty}\mbox{}{\vskip0.20\textheight}\mbox{}\hfill\begin{minipage}{0.55\textwidth}%
-Posvetilo
-\normalfont\end{minipage}
+% \thispagestyle{empty}\mbox{}{\vskip0.20\textheight}\mbox{}\hfill\begin{minipage}{0.55\textwidth}%
+% Posvetilo
+% \normalfont\end{minipage}
 
 % prazna stran
 \clearemptydoublepage
@@ -599,7 +599,16 @@ Na sliki \ref{smart_contract} je prikazan osnovni potek interakcije pametne pogo
 
 
 \subsection{Soglasje}
+Proces sinhronizacije glavne knjige v omrežju je imenovan soglasje.
+Zagotavlja, da se glavna knjiga posodobi le takrat, ko so transakcije in podatkovni bloki potrjeni s strani zaupanja vrednih udeležencev omrežja.
+Glavna knjiga se posodobi tako, da vsi udeleženci omrežja, izvedejo enake (zapisane) transakcije v istem vrstnem redu.
+Slika \ref{consensus} grafično prikazuje primer doseženega soglasja.
 
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/consensus.png}
+	\label{consensus}
+	\caption{Doseženo soglasje v omrežju \cite{hyperledgerDocs}.}
+\end{figure}
 
 
 \subsection{Izvajalna okolja glede na zaupanje med udeleženci}
@@ -739,7 +748,7 @@ Za njih je značilno, da transakcije validirajo in sekvečno uredijo, temu pa sl
 Vsaka sodelujoča entitea nato transakcije izvede v tem vrstem redu.
 Za enoličen način sekvenčnega izvajanja tu nastane potreba po novem, determinističnem programskem jeziku.
 En izmed predstavnikov je programski jezik za programiranje pogodb v omrežju Ethereum, Solidity.
-Ker je vsaka izmed transakcij izvedena s strani vsake entitete, to predstavlja veliko porabo razpoložljivih virov ter omejuje skaliranje ter performase.
+Ker je vsaka izmed transakcij izvedena s strani vsake entitete, to predstavlja veliko porabo razpoložljivih virov ter omejuje skaliranje ter učinkovitost izvajanja.
 
 Fabric pametne pogodbe izvaja po arhitekturi \textbf{izvedi-uredi-validiraj}.
 Vsaka transakcija je najprej izvedena s čimer se preveri njeno pravilnost.
@@ -748,65 +757,81 @@ Nazadnje je transakcija validirana s strani za to pooblaščenih zunanjih entite
 Tu v igro vstopi domensko specifična politika potrjevanja.
 Slednje prinaša potencialno velike performančne prihranke.
 
-\textbf{TODO:} dopolni s podrobnostmi
 
 \chapter{Decentralizirano izvajanje}
 \label{ch4}
 
-\section{Registracija in odkrivanje storitev v decentraliziranem okolju}
+Izvajanje storitev se danes seli v oblak.
+Ta način izvajanja s seboj prinaša kar nekaj prednosti, kot so samodejno skaliranje in istanciranje posamezne storitve, glede na trenutne zahteve in potrebe.
+Računalniški oblak je abstrackija, ki za seboj skriva ogromne podatkovne in računske centre.
+Ti so v večini v lasti velikih korporacij, prednjačijo Amazon, Google in Microsoft.
+Odvisnost od ponudnika računalniškega oblaka zna biti problematična, napaka v sistemu lahko povzroči večurno nedostopnost naših storitev. 
+Navkljub skrbi, ki jo ponudniki posvečajo vzdrževanju 100\% dosegljivosti, od zadnjega odmevnejšega primera mineva le dobro leto in pol \cite{awsFail}.
 
-Izvajanje storitev se danes seli v oblak, kjer se posamezne instance storitve replicira glede na trenutne potrebe.
-
-Izvajanje storitev želimo decentralizirati - vsaka sodelujoča entiteta v omrežju lahko, pod določenimi pogoji, izvaja
-katerokoli izmed nabora razpoložljivih storitev.
-Prednost, ki jo prinaša decentralizirano izvajanje poslovne logike je praktično nemogoč napad zavrnitev storitve (DOS) in
-porazdeljen napad zavrnitve storitve (DDOS).
+Izvajanje storitev želimo decentralizirati - vsaka sodelujoča entiteta v omrežju lahko, pod določenimi pogoji, izvaja katerokoli izmed nabora razpoložljivih storitev.
+Prednost, ki jo prinaša decentralizirano izvajanje poslovne logike je praktično nemogoč napad zavrnitev storitve (DOS) in porazdeljen napad zavrnitve storitve (DDOS).
 Napadalec je zmožen posamezno sodelujočo entiteto v omrežju obremeniti do te mere, da le ta preneha z izvajanjem določene storitve.
 Decentraliziran sistem bi v primeru prenehanja izvajanja storitve na eni entiteti izvajanje dodelil drugi. Postopek bi moral biti za končnega uporabnika storitve transparenten.
+S tehnologijo podatkovnih blokov bi bilo moč posamezne klice storitev tudi finančno ovrednotiti.
+Trenutno je potrebnih več klicev, ki kot prvo izvedejo samo poslovno logiko aplikacije, temu pa sledi klic, ki izvede še finančno transakcijo.
+Podatkovna veriga nam omogoča, da klice storitev opremimo s finančnimi podatki in ob uspešni izvedbi izvajalca sistem samodejno nagradi.
 
-Dodatno se vsak klic storitve opremi s finančnimi podatki in ob uspešno izvedenem klicu je izvajalec za svoje delo nagrajen.
+V nadaljevanju diplomskega dela so predstavljeni osnovni koncepti rešitve registracije in odkrivanja storitev v decentraliziranem okolju.
 
 \section{Odkrivanje storitev v decentraliziranem okolju}
-Predlagana rešitev registracije in odkrivanja storitve v decentraliziranem okolju je sestavljna iz naštetih komponent:
+Predlagana zasnova sistema za odkrivanje storitev v decentraliziranem okolju sestoji iz naslednjih komponent:
 \begin{itemize}
-	\item Registracija nove storitve \ref{registerService}
+	\item Registracija nove aplikacije \ref{registerService}
 	\item Registracija izvajalcev \ref{registerWorker}
-	\item Registracija izvajanja \ref{registerExecution}
+	\item Registracija storitve \ref{registerExecution}
 	\item Odkrivanje storitev \ref{serviceDiscovery}
 \end{itemize}
 
-\subsection{Registracija nove storitve}
+Registracija in odkrivanje storitve je uporaba že znanih konceptov, prenesenih v okolje, kjer vlogo registra storitev prevzema porazdeljena glavna knjiga.
+Dodatno smo uvedli še registracijo aplikacije, ki je pripravljena na izvajanje v decentraliziranem omrežju in registracijo izvajalcev.
+Slednja omogoča lastništvo več izvajalnih naprav eni posamezni identiteti.
+
+
+\subsection{Registracija nove aplikacije}
 \label{registerService}
-Vsak izmed sodelujočih ima možnost v omrežje javno objaviti novo storitev, za katero navede pogoje uporabe.
-Izvorna koda oziroma izvršljiva datoteka storitve se shrani shrani v decentralizirano shrambo, temu pa sledi zapis podatkov o storivti v glavno knjigo.
-Ob uspešni registraciji se v omrežju sproži dogodek, na katerega se sodelujoče entitete odzovejo.
-Glede na lastne določene omejitve in trenutno aktivna naročila v omrežju, lahko poljuben člen omrežja prične z izvajanjem storitev.
+
+Omrežje je javno, kdorkoli lahko objavi in ponudi novo aplikacijo, pripravljeno za izvajanje.
+Izvorno kodo oziroma izvršljivo datoteko aplikacije shranimo v decentralizirano shrambo.
+Temu sledi zapis podatkov (ime, verzija, izvajalno okolje...) o aplikaciji v glavno knjigo.
+Ob uspešni registraciji omrežje proži dogodek s podatki o novi aplikaciji.
+Posamezni izvajalec, ki se registrira na te dogodke, lahko takoj prične z izvajanjem aplikacije, če se za to odloči, oziroma mu izvajanje dodeli omrežje.
+Razporejanje opravil in izvajanja po omrežju je stvar prihodnjih raziskav.
 
 \subsection{Registracija izvajalcev}
 \label{registerWorker}
-Vsaka digitalna identiteta lahko upravlja z več izvajalnimi enotami.
-Ta pristop omogoča enemu uporabniškemu računu pripis vseh nagrad, ki jih posamezni izvajalec prisluži.
+Vsaka identiteta lahko upravlja z več izvajalnimi enotami.
+Ta pristop omogoča enemu uporabniškemu računu pripis vseh nagrad, ki si jih posamezni izvajalec prisluži.
 Podatki, ki se o posameznem izvajalcu zabeležijo so: lastnik (account), unikatna številka izvajalca (id) in naslov, preko katerega je izvajalec dosegljiv.
-Posameznemu izvajalcu se lokalno konfigurira omejitve glede porabe sistemskih virov, ki jih lastnik nameni decentraliziranemu izvajanju storitev.
+Izvajalcu se lokalno konfigurira omejitve glede porabe sistemskih virov, ki jih lastnik nameni decentraliziranemu izvajanju storitev.
 
 \subsection{Registracija izvajanja storitve}
 \label{registerExecution}
-Izvorno kodo oz. izvršljivo datoteko storitve se najprej pridobi iz omrežja.
-Nadzorni proces nato storitev zažene, storitev sama pa ob inicializaciji sama izcede postopek registracije.
-V glavno knjigo se zabeleži izvajalca in storitev, ki se izvaja.
+Ob zahtevi za pričetek izvajanja aplikacije, ki je bila predhodno registrirana v omrežju, se prične postopek pridobivanja informacij o želeni storitvi.
+Iz registra aplikacije se pridobi podatke o imenu, verziji, lastniku in lokaciji shrambe.
+Izvorno kodo oz. izvršljivo datoteko storitve se nato pridobi iz omrežja, po potrebi jo nadzorni proces prevede in zažene.
+Storitev sama ob inicializaciji poskrbi za registracijo v registru (glavna knjiga).
+Zabeleži se podatke o izvajalcu in storitvi, ki je pričela z izvajanjem.
 
 \subsection{Odkrivanje storitve}
 \label{serviceDiscovery}
-Storitve, ki se trenutno izvajajo v omrežju, pridobimo z enostavnim vpogledom v glavno knjigo.
-Med razpoložljivimi storitvami odjemalec izbere eno, pridobi podatke o lokaciji izvajanja in izvede klic po izbranem protokolu.
-Od tu naprej komunikacija med storitvami poteka preko trenutnih protokolov (REST, gRPC, Event-driven).
+Želeno storitev, pod pogojem, da se v omrežju izvaja, pridobimo z enostavno poizvedbo v glavni knjigi.
+Med razpoložljivimi storitvami odjemalec izbere eno, pridobi podatke o lokaciji izvajanja in izvede klic.
+Od tu naprej komunikacija med storitvami poteka preko izbranega protokola (REST, gRPC, Event-driven).
 
-TODO: Opis predlaganega koncepta za registracijo in odkrivanje storitev s pametnimi pogodbami.
 
-Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
+Deregistracija storitev predstavlja težji del naloge, ker ni centralnega procesa, ki bi bdel nad registriranimi storitvami in preverjal njihovo dosegljivost.
+Potrebna bo dodatno raziskovalno delo, kako učinkovito deregistrirati storitev, podobno kot je to rešeno pri trenutno uporabljenih registrih (etcd, Consul, ZooKeeper).
+Za deregistracijo posamezne storitve je tako zaenkrat odgovoren nadzorni proces.
 
 \chapter{Implementacija predlagane rešitve}
 \label{ch5}
+
+Pri implementaciji predstavljenih konceptov sem se osredotočil le na osnovne funkcionalnosti registra - registracijo aplikacije, registracijo izvajalcev in registracijo storitve.
 
 \begin{figure}[h]
 \includegraphics[width=1.0\textwidth]{slike/dApi_sl.png}
@@ -817,11 +842,10 @@ Predvidoma do sredine junija, ko bo predvidoma znana končna zasnova.
 Na sliki \ref{scheme} je prikazana shema predlagane rešitve. Osrednji del omrežja je nadzorni proces - 
 dApi manager, ki dostopa do glavne knjige, decentralizirane shrambe in upravlja s storitvami, ki jih gostitelj izvaja.
 Gostiteljski sistem v trenutni različici podpira upravljanje z vsebniki Docker.
-Storitve, ki so na voljo za izvajanje so shranjene na datotečni shrambi IPFS, podatkovna veriga je 
-osnovana na Ethereum verigi. Posamezne komponente sistema so podrobneje opisane v nadaljevanju.
+Aplikacije, ki so na voljo za izvajanje so shranjene na datotečni shrambi IPFS, podporna podatkovna veriga je na omrežju Ethereum. Posamezne komponente sistema so podrobneje opisane v nadaljevanju.
 
 \section{Nadzorni proces}
-Nadzorni proces za izvajanje dApijev skrbi za:
+Nadzorni proces za izvajanje decentraliziranih storitev (dAPIjev) skrbi za:
 \begin{itemize}
 	\item registracijo novih storitev v omrežje, 
 	\item prenos izvršljivih datotek v in iz omrežja,
@@ -869,7 +893,7 @@ V svoji implementaciji sem uporabil decentralizirano shrambo IPFS.
 Gre za projekt, osnovan na omrežju Ethereum, namen projekta pa je shranjevanje datotek v porazdeljeni shrambi, dostop do njih pa preko omrežji P2P, podobno kot deluje protokol BitTorrent, po katerem se projekt tudi zgleduje.
 Vsako datoteko, ki jo želimo shraniti v omrežje, odjemalec razbije na podatkovne bloke, izračuna zgoščeno vrednost posameznega bloka, te vrednosti pa nato sestavi v strukturo imenovano Merkle Tree.
 Datoteko pridobimo enostavno preko zgoščene vrednosti v korenu drevesa.
-Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, vsebino posameznega pa hitro preveri z izračunom zgoščene vrednosti. V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, če sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična zahtevani. \cite{Ipfs}
+Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, vsebino posameznega pa hitro preveri z izračunom zgoščene vrednosti. V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, v kolikor sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična podani. \cite{Ipfs}
 
 \section{Odjemalec za Ethereum omrežje}
 Sistem za delovanje potrebuje odjemalca, ki se zna povezati v Ethereum omrežje.
@@ -971,11 +995,82 @@ uint _wIndex) public {
 }
 \end{lstlisting}
 
-Še večji problem nastopi ob deregistraciji izvajalca, tu bi bilo potrebno iterirati preko vseh registriranih storitev in poiskati izvajalca za brisanje.
+Večji problem nastopi ob deregistraciji izvajalca, tu bi bilo potrebno iterirati preko vseh registriranih storitev in poiskati izvajalca za brisanje.
 Ta del registra še ni implementiran in potrebuje dodatno pozornost v prihodnje.
 
 
 \section{Razširitev KumuluzEE platforme za podporo decentraliziranim aplikacijam}
+
+\subsection{Implementacija Kumuluz-dapi}
+Želja in cilj za učinkovit razvoj decentraliziranih aplikacij je priprava programskih vmesnikov, ki bodo razvijalcem omogočili enostavno nadgradnjo in predelavo obstoječih aplikacij v dApije.
+V razvojni fazi je razširitev za aplikacije, ki uporabljajo platformo KumuluzEE.
+Vmesnik mora biti intuitiven in enostaven za uporabo, zato smo za zgled vzeli podobno in že obstoječo rešitev \textit{KumuluzEE Service Discovery}, ki rešuje problem odkrivanja storitev v oblačnih arhitekturah \cite{maldip}.
+
+\subsubsection{Anotacije}
+Razširitev vsebuje dve anotaciji, s katerima opremimo obstoječo aplikacijo.
+Prva služi registraciji storitve, z njo pa se opremi glavni aplikacijski razred REST storitve, ki je trenutno edini podprt način komunikacije.
+
+\begin{lstlisting}
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface RegisterDApi {
+	String name() default "";
+	String environment() default "";
+	String version() default "";
+	ApiType apiType() default ApiType.REST;
+}
+\end{lstlisting}
+
+Podatki, ki jih beležimo o posamezni storitvi so: \textit{ime (name), okolje (environment), verzija (version) in tip aplikacijskega vmesnika (apiType)}.
+
+
+Druga anotacija skrbi za označevanje parametrov, ki jih preko javanske tehnologije CDI, vrinemo v spremenljivke.
+
+\begin{lstlisting}
+@Qualifier
+@Target({ElementType.FIELD, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DiscoverDApi {
+	@Nonbinding String name() default "";
+	
+	@Nonbinding String environment() default "";
+	
+	@Nonbinding String version() default "";
+	
+	@Nonbinding ApiType apiType()
+	 default ApiType.REST;
+}
+\end{lstlisting}
+
+\subsubsection{Programska logika}
+Preko procesiranja anotacij pridobimo podatke o želeni storitvi, pri inicializaciji pa razširitev poskrbi za samodejno registracijo, oziroma odkrivanje storitve.
+Za delovanje razširitve potrebujemo omogočeno tehnologijo CDI.
+Metoda za registracijo storitve je povsem enostavna, uporabljamo pa knjižnico Web3j.
+Web3j je majhna knjižnica, namenjena aplikacijam Java in Android, ki se zna povezati na omrežje Ethereum.
+Klice na REST vmesnik odjemalca (geth, parity) ovije v razrede in metode, omogoča pa tudi pretvorbo pogodb v jeziku Solidity v javanske razrede \cite{web3j}.
+
+\begin{lstlisting}
+private void registerService(
+	ServiceExecution apiExecutionDetails) {
+	
+	logger.info("Registering new service execution");
+	registry
+	.registerService(apiExecutionDetails.getApiHash(),
+	 apiExecutionDetails.getWorker(),
+	 apiExecutionDetails.getLocation()).observable()
+	.subscribe(tx -> {
+	BigInteger gasUsed = tx.getGasUsed();
+	logger.info("New dApi executor registered: "
+	 + apiExecutionDetails.toString() + 
+	 ". Gas spent: " + gasUsed);
+	logger.info("Block number: "
+	 + tx.getBlockNumber());
+	});
+}
+\end{lstlisting}
+
+
 
 \subsection{Priprava aplikacije}
 V standardno KumuluzEE aplikacijo je potrebno vključiti razširitev \textit{kumuluz-dapi}. 
@@ -1004,14 +1099,30 @@ Trenutno sistem podpira le vsebnike Docker, ki jih je moč pridobiti preko omre�
 
 \chapter{Delovanje in evalvacija}
 
-\section{Demo aplikacija}
+\section{Testna aplikacija}
 
-Za namene demonstracije delovanja sistema sem implementiral dve preprosti REST storitvi.
-Prva se ob zagonu registrira kot izvajalec, druga ob zagonu poišče prvo in nam ob klicu storitve le posreduje podatke, ki jih pridobi od prve.
-Storitev ki se registrira v omrežje ima le eno izpostavljeno točko - seznam vseh uporabnikov.
-Podobno velja za drugo, ki prvo storitev kliče in nam podatke samo posreduje naprej.
+Za namene testiranja delovanja sistema sem implementiral dve preprosti REST storitvi - uporabniki (users) in kupci (customers).
+Storitev \textit{uporabniki} hrani seznam vseh uporabnikov v sistemu.
+Storitev \textit{kupci} od prve storitve pridobi seznam uporabnikov in ga le posreduje naprej.
+Prva storitev testira uspešnost registracije izvajanja, medtem ko druga služi kot test odkrivanja uspešno registrirane storitve.
+
+Implementirani storitvi sta zelo enostavni, sestavljata ju le po dva Javanska razreda, zato jih na tem mestu ne bi posebej predstavljal.
+
+\section{Testiranje}
+Celotnega sistema nisem uspel spraviti v popolnoma delujoče stanje, zaradi težav in pomankljivosti, ki so podrobno navedene v podpoglavju \ref{improvments}.
+Ob zagonu nadzornega procesa se uspešno le-ta uspešno registrira kot izvajalec.
+Zatem s klicem na \textit{/dapi/{account}/registerApi} uspešno prenese sliko Docker na shrambo IPFS in programski vmesnik registrira na omrežje.
+Uspešno se izvede tudi proženje dogodka, ki sodelujoče obvesti o novo objavljeni storitvi.
+
+S klicem na \textit{/dapi/{address}/startService} se iz shrambe IPFS prenese slika aplikacije, vendar je le ta poškodovana in je ni moč naložiti ter izvesti.
+Sistem sem ročno zaobšel in preko nadzornega procesa zagnal lokalno kopije slike.
+Storitev se uspešno zažene in registira v omrežju, tu pa nastopi naslednja težava.
+Storitev je moč odkriti, vendar ne takoj po registraciji.
+Vzroka za to nisem uspel najti, ko pa je storitev moč odkriti, se testna aplikacija \textit{kupci} uspešno poveže na storitev \textit{uporabniki} in ob zahtevi pridobi celoten seznam uporabnikov, ki ga le posreduje naprej.
+
 
 \section{Pomankljivosti trenutnega sistema in izboljšave v prihodnosti}
+\label{improvments}
 
 Prva različica sistema ponuja kar nekaj možnosti za izboljšave.
 Prva izmed pomankljivosti je sama cena registracije in deregistracije storitev in njihovih izvajalcev.
@@ -1053,13 +1164,30 @@ Način, kako to izvesti je zaenkrat še neznanka in bo stvar prihodnjih raziskav
 \chapter{Zaključek}
 \label{stroka}
 
-Proof of Execution, Scheduling, naročila izvajanja in potek avkcij
-\textbf{TODO:} Glavne ugotovitve, povzetek narejenega. Kratka evalvacija.
+Mikrostoritve in oblačna arhitektura sta prinesli revolucijo v načinu razmišljanja in gradnje aplikacij.
+Približujemo se temu, kar v fizični proizvodnji poznamo že dolgo, in sicer hitre proizvodne linije za izdelke.
+Podobno lahko danes, tako kot kocke, sestavljamo tudi aplikacije.
+Ne zanima nas kako vsak posamezen košček celotnega sistema rešuje svoj del problema, ampak koristimo vnaprej definiran aplikacijski vmesnik, ki se načeloma ne spreminja.
+Aplikacije, ki so končni produkt takega načina zlaganja, so odporne na hitre spremembe v okolju, sposobne samodejnega odpravljanja napak in skaliranja.
+Sestavni deli so med seboj šibko sklopljeni in odgovorni le za svoje ozko usmerjene naloge.
+Problem, ki ga naslavljamo, je morda enostavno spregledati.
+Trenutni sistem je odporen na vse vrste programskih napak, s pomočjo replikacij preko fizično ločenih računskih centrov deloma tudi strojnih okvar, še vedno pa lahko trpi dosegljivost in odzivnost \cite{awsFail}.
+V kolikor nam uspe te vire računske moči decentralizirati, sistemom dodamo še dodatno dimenzijo odpornosti in praktično onemogočimo napade zavrnitve odzivnosti (DOS).
 
-Napisan ob zaključku dela.
+Na poti k temu cilju je potrebno rešiti veliko odprtih vprašanj, ki so v trenutnih oblačnih sistemih že rešeni, ter problemi, ki se pojavijo pri decentraliziaciji.
+
+V diplomski nalogi sem se ukvarjal z registracijo in odkrivanjem storitev v decentraliziranem okolju.
+Namestno centralnega registra sem uporabil tehnologijo podatkovnih blokov, ki s pomočjo kriptorgrafskih prijemov zagotavlja nespremenljivost in enostavno preverljivost zapisanih in porazdeljenih podatkov.
+Registra mi ni uspelo razviti v meri, ki sem si jo zamislil.
+Pri implementaciji konceptov sem naletel na kup nepredvidenih težav, povezanih predvsem s samo tehnologijo podatkovnih blokov.
+Rezultat je delno delujoč sistem, ki je osnovan na omrežju Ethereum.
+Omrežje ni primerno za izvajanje nalog, ki so bile zamišljene, zato za nadaljnje raziskovalno delo po vsej verjetnosti potrebujemo prilagojeno implementacijo celotne podatkovne verige.
+
+Navkljub le delnemu uspehu bi, ob dodatnem raziskovalnem delu, lahko na področju decentraliziranega izvajanja dosegli nove mejnike in zakoličili pot naslednje generacije programske opreme.
 
 
-\newpage %dodaj po potrebi, da bo številka strani za Literaturo v Kazalu pravilna!
+
+% \newpage %dodaj po potrebi, da bo številka strani za Literaturo v Kazalu pravilna!
 \ \\
 \clearpage
 \addcontentsline{toc}{chapter}{Literatura}
