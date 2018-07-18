@@ -334,8 +334,12 @@ Aplikacije, grajene v arhitekturi mikrostoritev se večinoma izvajajo v velikih 
 Vsi ti mehanizmi omogočajo, da smo zmožni odgovoriti na tisoče hkratnih zahtevkov, pri tem pa ohranjamo dobre performančne lastnosti.
 Problemi nastopijo ob izpadu enega ali več računskih centrov, oziroma pri prenosu aplikacije iz enega v drug oblačni sistem.
 V diplomski nalogi sem raziskal tehnologijo veriženja podatkovnih blokov, ki predstavlja korak v smeri decentralizirane shrambe podatkov.
-Podobno stopnjo decentralizacije želimo doseči na ravni aplikacijske logike, kjer pa se pojavi veliko različnih problemov.
-Osredotočil sem se predvsem na decentralizirano odkrivanje storitev, ter razvil prvi prototip aplikacije ter razširitve za ogrodje KumuluzEE, ki demonstrirata decentraliziran način izvajanja.
+Podobno stopnjo decentralizacije želimo doseči na ravni aplikacijske logike in sicer na način, kjer bi poljubno storitev lahko izvajal poljuben član omrežja, za uspešno izvajanje pa bil tudi primerno finančno nagrajen.
+Zamišljamo si sistem, v katerem ne poznamo izpadov storitev ter dolgih odzivnih časov.
+Sistem decentraliziranega izvajanja bi nam hkrati olajšal finančno evaluirati posamezen klic, ter omogočil učinkovito izmenjavo vrednosti.
+V nalogi sem se predvsem na decentralizirano odkrivanje storitev, ter razvil prvi prototip aplikacije ter razširitve za ogrodje KumuluzEE, ki demonstrirata decentraliziran način izvajanja.
+Gre za pomembno svetovno novost, ki ima potencial začrtati nove smernice v računalniški panogi.
+Stojimo na robu znanih mej, ki jih želimo potisniti dalje.
 
 \bigskip
 
@@ -365,9 +369,11 @@ These principles allow us to effectively respond to thousands requests per secon
 The problems arrise when those cloud providers experience massive breakdowns or we wish to commute to different cloud provider.
 My thesis discusses blockchain technology that is currently one of the hot research topics.
 Blockchain provides decentralized and immutable data storage.
-Our vision is to enable that kind of decentralization to bussines logic (API).
+Our vision is to enable that kind of decentralization to bussines logic (API) in a way that everyone can participate, either by executing any of available services or consuming it.
+Executors are rewarded financially and the system enables us to efficiently transfer value.
 To achive that goal, we must solve multiple problems, one of which is decentralized service discovery.
 I have proposed a conceptual solution to service discovery in a decentralized environment and implemented first prototype, that enables decentralized execution of applications.
+We are standing on the edge of what we know is currently possible and are ready to push the boundaries even further. This can be the next big step in computer science.
 
 \bigskip
 
@@ -400,8 +406,10 @@ Tu se pojavlja vprašanje.
 Je možno tudi poslovno logiko prestaviti v decentralizirano okolje na način, da bo sodelujoči v omrežju ob klicu želene storitve vedno dobil odgovor, izvedla ga bo katerakoli entiteta, obenem pa zagotoviti pravilnost izvajana?
 Z uresničitvijo tega cilja bi miselnost decentraliziranih podatkov prestavili nivo višje, na nivo poslovne logike.
 Odzivnost in dosegljivost storitve bi s številom sodelujočih v omrežju dosegla 100\%, prav tako bi bilo praktično nemogoče izvesti napade DOS.
-
-V diplomski nalogi sem se osredotočil na reševanje problema odkrivanja storitev v decentraliziranem okolju.
+Gre za sistem neodvisnih entitet, ki so pripravljene proti primernemu plačilu, izvajati storitve na željo naročnika.
+Vsakdo lahko sodeluje, vsakdo lahko prispeva, vsako uspešno operacijo sistem samodejno nagradi.
+Tak sistem sestavlja veliko komponent, vsaka izmed njih potrebuje dobršno mero pozornosti in raziskovalnega dela. Ena izmed osrednjih komponent je način, kako v decentraliziranem okolju odkriti druge, trenutno aktivne storitve, ko jih naša storitev potrebuje. 
+V diplomski nalogi sem se podrobneje posvetil reševanju tega problema, pred tem pa je predstavljenih nekaj tehnologij in tehnik, ki so za moje raziskovalno delo relavantne.
 
 
 \chapter{Arhitekturni koncepti mikrostoritev}
@@ -459,6 +467,12 @@ Uporabnikom ni potrebno investirati v lastno strojno opremo, podobno kot obe ses
 
 \section{Vzorci}
 
+Ena funkcionalna enota, šibka sklopljenost.
+
+V tem podpoglavju predstavljam še tri vzorce, značilne za arhitekturo mikrostoritev: metrike, preverjanje odzivnosti ter odkrivanje storitev.
+Te tri storitve skupaj predstavljajo skoraj vse elementarne dele sistema za decentralizirano izvajanje.
+Za učinkovit sistem potrebujemo načine, kako ugotoviti, katere storitve delujejo po pričakovanjih in katere ne, ter katera izmed sodelujočih entitet v omrežju nam lahko najhitreje ponudi odgovor na zahtevo -- izvede storitev.
+
 \subsection{Metrike}
 
 Posamezna storitev se lahko izvaja na različnih (fizičnih) lokacijah, na različni strojni opremi in v več instancah.
@@ -477,7 +491,6 @@ Ena izmed bolj znanih storitev za zbiranje aplikacijsih metrik je Prometheus, od
 Projekt je bil, takoj za orkestracijskim okoljem Kubernetes, pridružen fundaciji CNCF.
 Prometheus zahteva metrike od storitve (način pull), jih agregira in proži morebitna opozorila.
 Skupaj z ogrodjem Grafana omogoča celovit grafičen vpogled v zbrane metrike \cite{Prometheus}.
-
 
 \subsection{Preverjanje odzivnosti (Health Check)}
 
@@ -571,6 +584,12 @@ Slika \ref{kubernetes_cluster} prikazuje osnovno shemo Kubernetes gruče.
 \chapter{Tehnologija veriženja podatkovnih blokov}
 \label{ch2}
 
+Izvajanje poslovne logike aplikacije uvrščamo med nivo hrambe podatkov in nivojem uporabniškega vmesnika.
+Decentralizirano hrambo podatkov danes že poznamo, od tu pa gradimo in razmišljamo naprej, v smeri decentralizacije poslovne logike.
+V tem poglavju bom predstavil tehnologijo in osnovne ideje, ki omogočajo porazdeljeno hrambo podatkov.
+Koncepti, ki so tu v uporabi, predstavljajo osnovo in odskočno desko za decentralizacijo izvajanja storitev.
+Podatkovni bloki nam omogočajo trajno in nespremenljivo sklepanje ter zapis dogovorov o podrobnostih izvajanja, kar je nujno za zanesljiv sistem takšnih storitev.
+
 Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s soglasjem, sistemom \sn{pametnih} pogodb ter drugih pomožnih tehnologij \cite{hyperledgerWeb}. Osrednja komponenta sistema je glavna knjiga (ang. ledger), ki beleži vse akcije (transakcije), izvedene na omrežju \cite{hyperledgerDocs}.
 Entiteta, ki transakcijo izvede, jo podpiše s svojim privatnim ključem.
 Skupek transakcij tvori podatkovni blok, bloki pa se med seboj povezujejo v podatkovno verigo.
@@ -585,6 +604,11 @@ Ni več potrebe po zunanji, zaupanja vredni, entiteti.
 
 Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. \sn{pametne pogodbe}.
 To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije \cite{hyperledgerDocs}.
+
+V nadaljevanju tega poglavja se bom posvetil osnovnim konceptom ter predstavil posebnosti dveh implementacij te tehnologije - omrežji Ethereum in Hyperledger Fabric.
+Osredotočil sem se predvsem na ti dve, ker do rešitve problema pristopata z različnih koncev.
+Prva predpostavlja popolnoma javno omrežje, kjer so identitete uporabnikov neznane, druga svoje prednosti gradi na predpostavki popolnega zaupanja med sodelujočimi identitetami.
+V želji zgraditi sistem, ki bo omogočal decentralizirano izvajanje storitev in preprečeval morebitne poneverbe izvedbe posameznih operacij, hkrati pa zagotavljal popolnoma anonimnost udeležencev, je verjetno smiselno uporabiti nekakšno fuzijo obeh pristopov.
 
 \section{Razlaga osnovnih konceptov}
 
@@ -774,6 +798,11 @@ Ob koncu je transakcija validirana s strani za to pooblaščenih zunanjih entite
 Tu v igro vstopi domensko specifična politika potrjevanja.
 Slednje prinaša potencialno velike performančne prihranke \cite{hyperledgerDocs}.
 
+\section{Tehnologija veriženja podatkovnih blokov v kontekstu decentraliziranega izvajanja}
+Decentralizirana hramba podatkov je osnova, na kateri je primerno graditi in osnovati sisteme, sposobne decentraliziranega izvajanja.
+Raziskave in tehnike uporabe kriptografskih in drugih protokolov, ki zagotavljajo nespremenljivost podatkov in v praksi tudi njihovo ponarejanje, lahko apliciramo nivo višje, v poslovno logiko.
+Trenutno znamo varno hraniti podatke na tisoče napravah, ter hkrati zagotavljati njihovo pristnost.
+Svoje zamisli o decentraliziranem registru sem osnoval prav na tej pomembni pridobitvi, kar bom podrobneje razložil v poglavju \ref{ch4}.
 
 \chapter{Decentralizirano izvajanje}
 \label{ch4}
@@ -794,6 +823,8 @@ Trenutno je potrebnih več klicev, ki kot prvo izvedejo samo poslovno logiko apl
 Podatkovna veriga nam omogoča, da klice storitev opremimo s finančnimi podatki in ob uspešni izvedbi izvajalca sistem samodejno nagradi.
 
 V nadaljevanju diplomskega dela so predstavljeni osnovni koncepti rešitve registracije in odkrivanja storitev v decentraliziranem okolju.
+Odkrivanje storitev v decentraliziranem okolju igra prav tako pomembno vlogo, kot pri storitvah, ki se izvajajo v oblačnih sistemih.
+Predstavljena rešitev predstavlja le del celotnega sistema, ki bo omogočal decentralizirano izvajanje.
 
 \section{Odkrivanje storitev v decentraliziranem okolju}
 Predlagana zasnova sistema za odkrivanje storitev v decentraliziranem okolju sestoji iz naslednjih komponent:
@@ -818,6 +849,14 @@ Temu sledi zapis podatkov (ime, verzija, izvajalno okolje...) o aplikaciji v gla
 Ob uspešni registraciji omrežje proži dogodek s podatki o novi aplikaciji.
 Posamezni izvajalec, ki se registrira na te dogodke, lahko takoj prične z izvajanjem aplikacije, če se za to odloči, oziroma mu izvajanje dodeli omrežje.
 Razporejanje opravil in izvajanja po omrežju je stvar prihodnjih raziskav.
+Preprost diagram poteka je prikazan na sliki \ref{register_api}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{slike/register_api.png}
+	\label{register_api}
+	\caption{Registracija nove aplikacije}
+\end{figure}
 
 \subsection{Registracija izvajalcev}
 \label{registerWorker}
@@ -825,6 +864,14 @@ Vsaka identiteta lahko upravlja z več izvajalnimi enotami.
 Ta pristop omogoča enemu uporabniškemu računu pripis vseh nagrad, ki si jih posamezni izvajalec prisluži.
 Podatki, ki se o posameznem izvajalcu zabeležijo so: lastnik (account), unikatna številka izvajalca (id) in naslov, preko katerega je izvajalec dosegljiv.
 Izvajalcu se lokalno konfigurira omejitve glede porabe sistemskih virov, ki jih lastnik nameni decentraliziranemu izvajanju storitev.
+Postopek je shematsko prikazan na sliki \ref{register_worker}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1.0\textwidth]{slike/register_worker.png}
+	\label{register_worker}
+	\caption{Postopek registracije izvajalcev}
+\end{figure}
 
 \subsection{Registracija izvajanja storitve}
 \label{registerExecution}
@@ -833,13 +880,27 @@ Iz registra aplikacije se pridobi podatke o imenu, verziji, lastniku in lokaciji
 Izvorno kodo oz. izvršljivo datoteko storitve se nato pridobi iz omrežja, po potrebi jo nadzorni proces prevede in zažene.
 Storitev sama ob inicializaciji poskrbi za registracijo v registru (glavna knjiga).
 Zabeleži se podatke o izvajalcu in storitvi, ki je pričela z izvajanjem.
+Gre za najbolj kompleksen del registracije, shematsko je prikazan na sliki \ref{register_service}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{slike/register_service.png}
+	\label{register_service}
+	\caption{Postopek registracije izvajanja storitve}
+\end{figure}
 
 \subsection{Odkrivanje storitve}
 \label{serviceDiscovery}
 Želeno storitev, pod pogojem, da se v omrežju izvaja, pridobimo z enostavno poizvedbo v glavni knjigi.
-Med razpoložljivimi storitvami odjemalec izbere eno, pridobi podatke o lokaciji izvajanja in izvede klic.
+Med razpoložljivimi storitvami odjemalec izbere eno, pridobi podatke o lokaciji izvajanja in izvede klic \ref{discover_service}.
 Od tu naprej komunikacija med storitvami poteka preko izbranega protokola (REST, gRPC, Event-driven).
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{slike/discover_service.png}
+	\label{discover_service}
+	\caption{Postopek odkrivanja}
+\end{figure}
 
 Deregistracija storitev predstavlja težji del naloge, ker ni centralnega procesa, ki bi bdel nad registriranimi storitvami in preverjal njihovo dosegljivost.
 Potrebna bo dodatno raziskovalno delo, kako učinkovito deregistrirati storitev, podobno kot je to rešeno pri trenutno uporabljenih registrih (etcd, Consul, ZooKeeper).
@@ -851,7 +912,7 @@ Za deregistracijo posamezne storitve je tako zaenkrat odgovoren nadzorni proces.
 Pri implementaciji predstavljenih konceptov sem se osredotočil le na osnovne funkcionalnosti registra - registracijo aplikacije, registracijo izvajalcev in registracijo storitve.
 
 \begin{figure}[h]
-\includegraphics[width=1.0\textwidth]{slike/dApi_sl.png}
+\includegraphics[width=0.8\textwidth]{slike/dApi_sl.png}
 \label{scheme}
 \caption{Arhitekturna shema rešitve}
 \end{figure}
@@ -1194,12 +1255,13 @@ V kolikor nam uspe te vire računske moči decentralizirati, sistemom dodamo še
 Na poti k temu cilju je potrebno rešiti veliko odprtih vprašanj, ki so v trenutnih oblačnih sistemih že rešeni, ter problemi, ki se pojavijo pri decentraliziaciji.
 
 V diplomski nalogi sem se ukvarjal z registracijo in odkrivanjem storitev v decentraliziranem okolju.
-Namestno centralnega registra sem uporabil tehnologijo podatkovnih blokov, ki s pomočjo kriptorgrafskih prijemov zagotavlja nespremenljivost in enostavno preverljivost zapisanih in porazdeljenih podatkov.
+Namesto centralnega registra sem uporabil tehnologijo podatkovnih blokov, ki s pomočjo kriptografskih prijemov zagotavlja nespremenljivost in enostavno preverljivost zapisanih in porazdeljenih podatkov.
 Registra mi ni uspelo razviti v meri, ki sem si jo zamislil.
 Pri implementaciji konceptov sem naletel na kup nepredvidenih težav, povezanih predvsem s samo tehnologijo podatkovnih blokov.
 Rezultat je delno delujoč sistem, ki je osnovan na omrežju Ethereum.
 Omrežje ni primerno za izvajanje nalog, ki so bile zamišljene, zato za nadaljnje raziskovalno delo po vsej verjetnosti potrebujemo prilagojeno implementacijo celotne podatkovne verige.
 
+Odkrivanje storitev je le ena v vrsti komponent, ki jih polno delujoč decentraliziran sistem potrebuje.
 Navkljub le delnemu uspehu bi, ob dodatnem raziskovalnem delu, lahko na področju decentraliziranega izvajanja dosegli nove mejnike in zakoličili pot naslednje generacije programske opreme.
 
 
