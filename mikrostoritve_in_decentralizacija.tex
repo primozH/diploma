@@ -467,7 +467,12 @@ Uporabnikom ni potrebno investirati v lastno strojno opremo, podobno kot obe ses
 
 \section{Vzorci}
 
-Ena funkcionalna enota, šibka sklopljenost.
+Ključne lastnosti mikrostoritev so predvsem ozka usmerjenost v reševanje specifičnih težav.
+Storitve so med seboj šibko sklopljene, kar predstavlja prednost pri nadgradnjah in zamenjavah implementacij, za delovanje sistema, vsaj v teoriji, potrebujemo le jasno določene vmesnike.
+Upravljanje in usklajevanje storitev prevzema centralna avtoriteta, vsaka storitev pa je sama odgovorna za svoje podatke.
+Napake so v dinamičnem sistemu pogoste, njihovo učinkovito zaznavanje in upravljanje, je v domeni tako nadzornika, kot storitve same.
+Celoten sistem lahko primerjamo z operacijskim sistemom Unix, ki ga sestavlja vrsta procesov, ki so med seboj neodvisni, opravljajo ozko usmerjeno nalogo, med seboj pa jih lahko poveezujemo preko cevovodov.
+Pri mikrostoritvah cevovode nadomestimo z omrežnimi protokoli (HTTP, gRPC) \cite{microservicesMartin}.
 
 V tem podpoglavju predstavljam še tri vzorce, značilne za arhitekturo mikrostoritev: metrike, preverjanje odzivnosti ter odkrivanje storitev.
 Te tri storitve skupaj predstavljajo skoraj vse elementarne dele sistema za decentralizirano izvajanje.
@@ -584,7 +589,7 @@ Slika \ref{kubernetes_cluster} prikazuje osnovno shemo Kubernetes gruče.
 \chapter{Tehnologija veriženja podatkovnih blokov}
 \label{ch2}
 
-Izvajanje poslovne logike aplikacije uvrščamo med nivo hrambe podatkov in nivojem uporabniškega vmesnika.
+Izvajanje poslovne logike aplikacije uvrščamo med nivo hrambe podatkov in nivo uporabniškega vmesnika.
 Decentralizirano hrambo podatkov danes že poznamo, od tu pa gradimo in razmišljamo naprej, v smeri decentralizacije poslovne logike.
 V tem poglavju bom predstavil tehnologijo in osnovne ideje, ki omogočajo porazdeljeno hrambo podatkov.
 Koncepti, ki so tu v uporabi, predstavljajo osnovo in odskočno desko za decentralizacijo izvajanja storitev.
@@ -824,7 +829,8 @@ Podatkovna veriga nam omogoča, da klice storitev opremimo s finančnimi podatki
 
 V nadaljevanju diplomskega dela so predstavljeni osnovni koncepti rešitve registracije in odkrivanja storitev v decentraliziranem okolju.
 Odkrivanje storitev v decentraliziranem okolju igra prav tako pomembno vlogo, kot pri storitvah, ki se izvajajo v oblačnih sistemih.
-Predstavljena rešitev predstavlja le del celotnega sistema, ki bo omogočal decentralizirano izvajanje.
+Poleg te komponente, za polno delujoč sistem potrebujemo še dodatne mehanizme, ki bodo preverjali pravilnost izvajanja, zbirali metrike in porazdeljevali delo.
+Predstavljena rešitev tako prispeva le del funkcionalnosti končnega sistema, ki bo omogočal decentralizirano izvajanje.
 
 \section{Odkrivanje storitev v decentraliziranem okolju}
 Predlagana zasnova sistema za odkrivanje storitev v decentraliziranem okolju sestoji iz naslednjih komponent:
@@ -1187,16 +1193,43 @@ Prva storitev testira uspešnost registracije izvajanja, medtem ko druga služi 
 Implementirani storitvi sta zelo enostavni, sestavljata ju le po dva Javanska razreda, zato jih na tem mestu ne bi posebej predstavljal.
 
 \section{Testiranje}
-Celotnega sistema nisem uspel spraviti v popolnoma delujoče stanje, zaradi težav in pomankljivosti, ki so podrobno navedene v podpoglavju \ref{improvments}.
-Ob zagonu nadzornega procesa se uspešno le-ta uspešno registrira kot izvajalec.
-Zatem s klicem na \textit{/dapi/{account}/registerApi} uspešno prenese sliko Docker na shrambo IPFS in programski vmesnik registrira na omrežje.
-Uspešno se izvede tudi proženje dogodka, ki sodelujoče obvesti o novo objavljeni storitvi.
+Pred zagonom sistema je potrebno ustvariti račun (account) na omrežju Ethereum in opraviti inicializacijo odjemalca IPFS.
+Identiteto na omrežju Ethereum pridobimo enostavno že z nekaj kliki, v kolikor se poslužimo grafičnega vmesnika Ethereum denarnice, oziroma preko ukazne vrstice z ukazom \texttt{geth account new}.
+Odjemalec nas nato vodi skozi celoten postopek ustvarjanja uporabniškega računa, ki ga zaščitimo z geslom.
+Podobno enostavna je inicializacija odjemalca IPFS, s to razliko, da edini uporabniški vmesnik predstavlja ukazna vrstica.
+Z ukazom \texttt{ipfs init} sprožimo postopek ustvarjanja računa, s katerim se kasneje predstavljamo v omrežju.
 
-S klicem na \textit{/dapi/{address}/startService} se iz shrambe IPFS prenese slika aplikacije, vendar je le ta poškodovana in je ni moč naložiti ter izvesti.
-Sistem sem ročno zaobšel in preko nadzornega procesa zagnal lokalno kopije slike.
-Storitev se uspešno zažene in registira v omrežju, tu pa nastopi naslednja težava.
+Pred zagonom nadzornega procesa moramo poskrbeti za delujoč odjemalec na omrežju Ethereum, uporabil sem testno omrežje Rinkeby, delujoč odjemalec za omrežje IPFS in gostiteljsko napravo za vsebnike Docker, dosegljivo preko protokola HTTP.
+Potrebna je še vnos nastavitvenih parametrov v konfiguracijsko datoteko.
+
+Ob zagonu nadzornega procesa se le-ta uspešno registrira kot izvajalec.
+Zatem lahko s klicem POST na \textit{/dapi/{ethereum-račun}/api} prenesemo sliko Docker na shrambo IPFS, proces pa poskrbi tudi za registracijo aplikacije v omrežju.
+Ob uspešno izvedeni akciji se proži dogodek, ki preostale sodelujoče obvesti o novo objavljeni storitvi.
+Klic GET na \textit{/dapi/{ethereum-račun}/api}, s podanimi ustreznimi poizvedovalnimi parametri (ime in verzija storitve), nam vrne podatke o objavljeni aplikaciji.
+
+\begin{lstlisting}
+{
+	"name": "users-dapi",
+	"version": "1.0.0",
+	"issuer": "0x6587f642a96bf0628486cd9...",
+	"location": "QmenABGsZcxdbQnhPJR93V...",
+	"hash": "wzjhuCjpfsKW6Rs5YStmly5Naq...",
+	"valid": true
+}	
+\end{lstlisting}
+
+Dobimo podatke o imenu, verziji, izdajalcu storitve, zgoščeno vrednost, ki enolično predstavlja aplikacijo, ter zgoščeno vrednost direktorija v IPFS sistemu (location).
+
+Klic POST na \textit{/dapi/{ethereum-račun}/startService} iz shrambe IPFS prenese sliko aplikacije, vendar je le ta poškodovana in je ni moč uvoziti v sistem Docker.
+Napake nisem uspel odpraviti, v času izdelave je bilo na omrežju Github prav na to temo prijavljenih nekaj napak.
+
+Za namene testiranja sem ročno vstavil sliko aplikacije v gostitelja Docker in preko nadzornega procesa ustvaril ter zagnal vsebnik.
+Vsebnik se uspešno zažene in registira v omrežju, tu pa nastopi naslednja težava.
 Storitev je moč odkriti, vendar ne takoj po registraciji.
-Vzroka za to nisem uspel najti, ko pa je storitev moč odkriti, se testna aplikacija \textit{kupci} uspešno poveže na storitev \textit{uporabniki} in ob zahtevi pridobi celoten seznam uporabnikov, ki ga le posreduje naprej.
+Vzroka za to nisem uspel najti, ko pa je storitev moč odkriti, se testna aplikacija \textit{kupci} uspešno poveže na storitev \textit{uporabniki} in ob zahtevi pridobi celoten seznam uporabnikov, ki ga v tem primeru le posreduje naprej.
+
+Kot predstavljeno, celotni sistem ni popolnoma funkcionalen, v nadaljevanju pa sem naletel še na par težav, ki trenutno na tak način in s temi sistemi, onemogočajo učinkovito izvajanje storitev.
+V podpoglavju \ref{improvments} so težave tudi podrobneje opisane.
 
 
 \section{Pomankljivosti trenutnega sistema in izboljšave v prihodnosti}
