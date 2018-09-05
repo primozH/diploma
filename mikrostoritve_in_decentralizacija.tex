@@ -329,7 +329,7 @@ Zahvaljujem se prof. Matjažu B. Juriču za podporo in usmeritve pri pripravi di
 
 Mikrostoritve danes vztrajno prevzemajo primat v svetu razvoja programske opreme kjer nadomeščajo tradicionalne aplikacije. Način gradnje omogoča učinkovitejše skaliranje, distribuiranje in medsebojno odkrivanje.
 Aplikacije, grajene v arhitekturi mikrostoritev se večinoma izvajajo v ra\-ču\-nal\-ni\-ških oblakih.
-Učinkovitejše skaliranje in elastičnost mikrostoritev omogoča ohranjati dobre performančne lastnosti in odgovoriti na tisoče sočasnih zahtevkov.
+Učinkovitejše skaliranje in elastičnost mikrostoritev omogoča ohranjati dobre performančne lastnosti in odgovoriti na tisoče so\-časnih zahtevkov.
 Danes mikrostoritve za izvajanje zahtevajo centralizirano okolje strežnikov, skupaj s tehnologijo vsebnikov.
 V diplomski nalogi smo raziskali področje decentraliziranega izvajanja mikrostoritev in razvili prototip, ki demonstrira izvajanje mikrostoritev na platformi Ethereum.
 Zamišljamo si sistem, v katerem ne poznamo izpadov storitev ter dolgih odzivnih časov.
@@ -357,7 +357,7 @@ Gre za pomembno svetovno novost, ki ima potencial začrtati nove smernice v rač
 %\noindent\textbf{Abstract:} 
 \noindent 
 
-Microservices today are one of the leading design principles, when it comes to building modern applications.
+Today microservices are one of the leading design principles, when it comes to building modern applications.
 Monoliths are being replaced with this modern architecural style and multiple tools and techniques are being develop to support it.
 Applications are deployed to a computing center, often called simply as cloud.
 Elasticity and effective scaling of such applications in contrast to monoliths are needed for good performance and high response rates.
@@ -391,15 +391,16 @@ Storitve se izvajajo distribuirano (porazdeljeno) in replicirano, pogosto na fiz
 
 Pred desetimi leti se je s pojavom digitalne valute Bitcoin pričel hiter razvoj decentralizirane tehnologije, ki omogoča nespremenljivo in preverljivo hrambo podatkov na poljubnih napravah v omrežju \cite{nakamoto2008bitcoin}.
 Tehnologija, poznana pod imenom veriženje podatkovnih blokov (ang. blockchain), je hitro povezala računalniške zanesenjake ter povzročila ustanovitev različnih fundacij, ki se ukvarjajo z njenim razvojem.
-Najbolj prepoznani med njimi sta fundaciji Hyperledger in Ethereum.
+Med bolj znanimi sta fundaciji Hyperledger in Ethereum \cite{hyperledgerWeb, ethereumweb}.
 
 Sistemi za izvajanje mikrostoritev so replicirani in distribuirani, vendar ne decentralizirani.
 Za arhitekturo, ki podpira izvajanje naših storitev, skrbi ena, centralna identiteta, najsi bo to Google, Amazon, Microsoft ali pa zasebni oblak oz. izvajalno okolje.
 Glavni cilj te diplomske naloge je aplicirati koncepte decentralizirane shrambe podatkov na nivo poslovne logike.
 Povezati želimo tehnologijo podatkovnih blokov in arhitekturo mikrostoritev na način, da zagotovimo večjo decentralizirano izvajanje. 
-Na osnovi tega želimo tudi večjo robustnost in odpornost celotnega sistema ter visoko razpoložljivost.
+Na osnovi tega želimo doseči večjo robustnost in odpornost celotnega sistema ter visoko razpoložljivost.
 V diplomski nalogi smo razvili prototip rešitve za decentralizirano izvajanje mikrostoritev.
 Sistem sestavlja poljubno mnogo med seboj povezanih entitet.
+Entiteta je naprava, ki izvaja protokol za decentralizirano izvajanje storitev.
 Te so pripravljene proti plačilu izvajati storitve na željo naročnika.
 Sodelovanje v omrežju je brezplačno in dostopno vsakomur, za opravljeno delo pa izvajalec prejme vnaprej predpisano nagrado.
 Celoten sistem sestoji iz množice različnih komponent, ki skupaj zagotavljajo preverljivost pravilnosti izvedenih operacij ter učinkovito porazdeljevanje ter prerazporejanje dela med entitetami.
@@ -417,7 +418,7 @@ Različni sestavni deli aplikacije so med seboj močno sklopljeni (medprocesna k
 Življenjski cikel takih aplikacij je po navadi dolg, sklopljenost sistema namreč ne omogoča enostavne menjave sestavnih delov ali celo programskega okolja.
 
 Arhitektura mikrostoritev rešuje nekatere probleme monolitnih aplikacij, vendar s tem povečuje kompleksnost celotnega sistema.
-Šibka sklopljenost sestavnih delov je glavna prednost arhitekture, komunikacije med njimi pa običajno poteka preko lahkih omrežnih tehnologij (HTTP).
+Šibka sklopljenost sestavnih delov je glavna prednost arhitekture, komunikacije med njimi pa običajno poteka preko lahkih omrežnih tehnologij (HTTP) ali asinhronih sporočilnih sistemov.
 Arhitektura nam omogoča enostavnejšo menjavo sestavnih delov aplikacije, kar privede do krajšega življenjskega cikla in uvedbe praks sprotne dostave in sprotne integracije \cite{monolithMicroservice}.
 
 
@@ -459,23 +460,23 @@ Prednosti teh aplikacij so dostopnost od koderkoli, za nemoteno delovanje aplika
 Storitev je zmožna dinamičnega skaliranja, da zadovolji trenutnim potrebam.
 PaaS (ang. Platform as a Service) -- platforma kot storitev, uporabnikom ponuja programsko platformo, brez stroškov nakupa in kompleksnosti upravljanja podporne strojne in programske opreme.
 IaaS (ang. Infrastructure as a Service) -- infrastruktura kot storitev, ponuja dostop do računskih virov (strežniki, omrežna oprema, shramba...).
-Uporabnikom ni potrebno investirati v lastno strojno opremo, podobno kot obe sestrski storitvi (SaaS in PaaS), je tudi ta zmožna samodejnega skaliranja \cite{ibmCloudComputing, TOFFETTI2017165O}.
+Uporabnikom ni potrebno investirati v lastno strojno opremo, podobno kot obe sestrski storitvi (SaaS in PaaS), je tudi ta zmožna samodejnega skaliranja \cite{ibmCloudComputing, TOFFETTI2017165}.
 
 Za razvoj spletnih aplikacij (SaaS) se je pojavila dodatna metodologija, poznana pod imenom The Twelve-Factor App.
 Metodologija predpisuje dobre prakse za razvoj aplikacij, z možnostjo učinkovitega skaliranja, menjave okolij, avtomatizacije gradnje ter namestitve in zmanjševanjem razlik med produkcijskim in razvijalskim okoljem.
-Faktorji, ki jih metodologija zajema \cite{12factor}:
+Metodologija zajema naslednje faktorje \cite{12factor}:
 \begin{itemize}
 	\item en sistem za upravljanje z verzijami
 	\item odvisnosti so eksplicitno navedene in izoloirane
 	\item konfiguracija je shranjena v okolju
-	\item podporne storitve se uporabljajo kot vire
+	\item podporne storitve se uporabljajo kot viri
 	\item strogo ločene faze gradnje in izvajanja storitve
 	\item aplikacije se izvajajo kot en ali več med seboj neodvisnih procesov
 	\item aplikacije so dostopne preko omrežnih vrat
 	\item skaliranje aplikacij na osnovi posameznih procesov
-	\item hitri zagonski časi ter sprostitev vseh odprtih povezav od zaustavitvi
+	\item hitri zagonski časi ter sprostitev vseh odprtih povezav ob zaustavitvi
 	\item razvojno, testno in produkcijsko okolje naj bodo med seboj čim bolj podobni
-	\item loge se obravnava kot niz dogodkov
+	\item dnevniški zapisi se obravnavajo kot niz dogodkov
 	\item ločen administratorski proces
 \end{itemize}
 
@@ -487,7 +488,8 @@ Z uporabo integracijskih orodij in tehnik zmanjšuje čas objave in zmanjša str
 \section{Podporni mehanizmi za delovanje mikrostoritev}
 
 Ključne lastnosti mikrostoritev so predvsem ozka usmerjenost v reševanje specifičnih problemov.
-Storitve so med seboj šibko sklopljene, kar predstavlja prednost pri nadgradnjah in menjavi implementacije, za delovanje sistema, vsaj v teoriji, potrebujemo le jasno določene vmesnike.
+Storitve so med seboj šibko sklopljene, kar predstavlja prednost pri nadgradnjah in menjavi implementacije.
+Za delovanje sistema, vsaj v teoriji, potrebujemo le jasno določene vmesnike.
 Upravljanje in usklajevanje storitev prevzema centralna avtoriteta, vsaka storitev je sama odgovorna za svoje podatke.
 Napake so v dinamičnem sistemu pogoste, njihovo učinkovito zaznavanje in upravljanje je v domeni tako nadzornika kot storitve same.
 Celoten sistem lahko primerjamo z operacijskim sistemom Unix, ki ga sestavlja vrsta med seboj neodvisnih procesov, ki opravljajo ozko usmerjeno nalogo, med seboj pa jih povezujemo preko cevovodov.
@@ -496,11 +498,11 @@ Pri mikrostoritvah cevovode nadomestimo z omrežnimi protokoli (HTTP, gRPC) \cit
 Vsaka storitev je samostojna in zadolžena za ustvarjanje lastnih dnevniških zapisov.
 Za pregled nad vsemi dnevniškimi zapisi v celotnem sistemu se uporablja tehnika zbiranja zapisov na enem, centralnem, delu.
 Razvite so tudi naprednejše tehnike zaznavanja in odpravljanja napak, ki so v velikih in kompleksnih sistemih vedno prisotne -- odpornost na napake.
-Ena izmed tehnik pri reševanju napak je z uporabo prekinjevalcev toka (ang. circuit break)\cite{sarcMag}.
+Ena izmed tehnik pri reševanju napak je z uporabo prekinjevalcev toka (ang. circuit breaker)\cite{sarcMag}.
 
 Dodatno so v naslednjih podpoglavjih podrobneje predstavljeni še trije mehanizmi, značilni za arhitekturo mikrostoritev: metrike, preverjanje odzivnosti ter odkrivanje storitev.
 Ustrezno povezani v celoto predstavljajo skoraj vse elementarne dele sistema, sposobnega decentraliziranega izvajanja.
-Za učinkovit sistem potrebujemo načine kako ugotoviti, katere storitve delujejo po pri\-ča\-ko\-va\-njih in katere ne ter, katera izmed sodelujočih entitet v omrežju nam lahko najhitreje ponudi odgovor na zahtevo -- izvede storitev.
+Za učinkovit sistem potrebujemo načine kako ugotoviti, katere storitve delujejo po pri\-ča\-ko\-va\-njih in katere ne ter, katera izmed sodelujočih entitet v omrežju nam lahko najhitreje ponudi odgovor na zahtevo -- izvede zahtevano storitev.
 
 \subsection{Spremljanje metrik}
 
@@ -548,16 +550,16 @@ Zakasnitev pri omrežnih klicih je bistveno večja kot pri programskih klicih zn
 
 \section{Vsebniki in orkestracija}
 
-Vsebniki danes nadomeščajo virtualne naprave (ang. virtual machines), predvsem na račun bolj učinkovite uporabe sistemskih virov in odpravljanjem ne\-po\-tre\-bnih podvajanj programske opreme.
+Vsebniki danes nadomeščajo virtualne naprave (ang. virtual machines), predvsem na račun bolj učinkovite uporabe sistemskih virov in odpravljanjem ne\-po\-tre\-bnih podvajanj nivojev programske opreme, predvsem na nivoju operacijskega sistema.
 
 \subsection{Tehnologija vsebnikov}
 Vsebnik je samostojen, izvršljiv skupek programske opreme, ki vsebuje vse potrebne odvisnosti, orodja, knjižnice in nastavitve, potrebne za izvajanje.
-Izvajanje kode znotraj vsebnika bo v vsakem gostiteljskem ogrodju (Windows, Linux, MacOS) enako.
+Izvajanje kode znotraj vsebnika je na vsakem gostiteljskem okolju (Windows, Linux, MacOS) enako.
 Notranji deli vsebnika so izolirani od okolice, kar odpravlja morebitne konflikte zaradi različnih verzij potrebnih odvisnosti.
 V primerjavi z virtualnimi napravami vsebniki virtualizirajo operacijski sistem in ne podporne strojne opreme.
 Z gostiteljskim sistemom in ostalimi vsebniki delijo jedro operacijskega sistema, vsak izmed njih v svojem naslovnem prostoru.
 
-Slika \ref{vm_vs_container} prikazuje bistveno razliko med vsebniško tehnologijo in tehnologijo virtualizacije \cite{dockerContainer}.
+Slika \ref{vm_vs_container} prikazuje bistveno razliko med vsebniško tehnologijo in tehnologijo virtualnih naprav \cite{dockerContainer}.
 
 \begin{figure}[h]
 	\includegraphics[width=1.0\textwidth]{slike/vsebniki_vm.png}
@@ -581,22 +583,22 @@ Ta tip avtomatizacije imenujemo orkestracija, ponuja pa nam vrsto funckionalnost
 \end{itemize}
 
 S pojavom in razširitvijo vsebniške tehnologije so se pojavila tudi številna orodja za orkestracijo.
-Med njimi najbolj poznana sta Docker Swarm in Kubernetes.
-Vsako izmed teh orodij orkestracijo rešuje na svoj način, Kubernetes je trenutno eno izmed najbolj razširjenih orodij.
+Med njimi sta najbolj poznana Docker Swarm in Kubernetes.
+Vsako izmed naštetih orodij orkestracijo rešuje na svoj način, Kubernetes je trenutno eno izmed najbolj razširjenih orodij.
 Njegove glavne funckionalnosti so:
 \begin{itemize}
 	\item avtomatizirano nameščanje in repliciranje vsebnikov
 	\item skaliranje
 	\item porazdeljevanje dela (ang. load balancing)
-	\item nameščanje posodobitev
-	\item odpornost na napake in odpovedi vsebnikov z avtomatskimi ponovnimi zagoni
+	\item progresivno nameščanje posodobitev
+	\item odpornost na napake in odpovedi vsebnikov s samodejnimi ponovnimi zagoni
 	\item kontrolirano izpostavljanje notranjega omrežja zunanjim storitvam
 \end{itemize}
 
 Glavni sestavni deli Kubernetesa \cite{mongoKubernetes}: 
 \begin{itemize}
 	\item gruča (ang. cluster): zbirka enega ali več strežnikov (ang. node), ki svoje vire ponujajo nadzornemu procesu
-	\item strok (ang. pod): skupina vsebnikov in pripadajočih shramb, ki so dodeljene enemu gostitelju. Predstavljajo osnovno celico Kubernetesa, znotraj stroka si procesi delijo lokalni omrežni naslovni prostor.
+	\item strok (ang. pod): skupina vsebnikov in pripadajočih shramb, ki so dodeljene enemu gostitelju. Predstavljajo osnovno enoto Kubernetesa, znotraj stroka si procesi delijo lokalni omrežni naslovni prostor.
 	\item oznake (ang. labels): dodeljene oznake posameznim entitetam, ki omogočajo upravljanje z njimi v skupini
 	\item storitve: skrbijo za osnovno dodeljevanje dela in izpostavljajo stroke zunanjemu svetu.
 \end{itemize}
@@ -610,14 +612,14 @@ Slika \ref{kubernetes_cluster} prikazuje osnovno shemo Kubernetes gruče.
 \end{figure}
 
 V tem poglavju smo pregledali arhitekturo mikrostoritev ter jo primerjali s klasično monolitno zasnovo aplikacij.
-Opisali smo tipične vzorce in tehnike ter orodja, ki se uporabljajo v tej arhitekturi.
+Opisali smo tipične vzorce in tehnike ter orodja, ki se uporabljajo pri tej arhitekturi.
 V naslednjem poglavju bomo pregledali tehnologijo veriženja podatkovnih blokov, kar bo osnova za realizacijo glavnega cilja diplomske naloge -- arhitekture za decentralizirano izvajanje mikrostoritev.
 
 \chapter{Tehnologija veriženja podatkovnih blokov in decentralizacija}
 \label{ch2}
 
 Tehnologija veriženja podatkovnih blokov je v svetu računalništva uveljavila koncept decentralizacije.
-Pri decentralizaciji gre za skupek povezanih entitet, ki so med sabo neodvisne, omogočena je interakcija med njimi, vsaka med njimi pa hrani svojo lokalno kopijo trenutnega stanja omrežja.
+Pri decentralizaciji gre za skupek povezanih entitet, ki so med sabo neodvisne, med njimi je omogočena interakcija, vsaka med njimi pa hrani svojo lokalno kopijo trenutnega stanja omrežja.
 Lokalno shranjeno stanje omrežja pri entiteti se mora ujemati z vsemi ostalimi stanji udeležencev v omrežju.
 Udeleženec lahko stanje omrežja spreminja le v primeru, da se z želenimi spremembami strinja zadosten delež vseh udeležencev (običajno večina).
 V kolikor temu ni tako, se spremembe ne shranijo oziroma se razveljavijo.
@@ -628,18 +630,26 @@ V tem poglavju bomo predstavili tehnologijo in osnovne ideje, ki omogočajo pora
 Koncepti pri decentralizirani hrambi podatkov predstavljajo osnovo in odskočno desko za decentralizacijo izvajanja poslovne logike.
 Podatkovni bloki nam omogočajo trajno in nespremenljivo sklepanje ter zapis dogovorov o podrobnostih izvajanja, kar je nujno za zanesljiv sistem takšnih storitev.
 
-Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s soglasjem, sistemom pametnih pogodb ter drugih po\-mo\-žnih tehnologij \cite{hyperledgerWeb}. Osrednja komponenta sistema je glavna knjiga (ang. ledger), ki beleži vse akcije (transakcije), izvedene na omrežju \cite{hyperledgerDocs}.
-Entiteta, ki transakcijo izvede, jo podpiše s svojim privatnim ključem.
+Veriženje podatkovnih blokov je peer-to-peer porazdeljena podatkovna shramba, dosežena s soglasjem, sistemom pametnih pogodb ter drugih po\-mo\-žnih tehnologij \cite{hyperledgerWeb}. 
+Osrednja komponenta sistema je glavna knjiga (ang. ledger), ki beleži vse akcije (transakcije), izvedene na omrežju \cite{hyperledgerDocs}.
+Entiteta, ki transakcijo izvede, le-to podpiše s svojim privatnim ključem.
 Skupek transakcij tvori podatkovni blok, bloki se med seboj povezujejo v podatkovno verigo.
 Posamezne člene verige med seboj povezuje zgoščevalna funkcija, na vhod katere postavimo zgoščeno vrednost trenutnega in prejšnjega bloka.
 Podatkovno verigo je moč vedno le podaljševati, trenutno veljavno in resnično stanje omrežja je trenutno najdaljša serija blokov.
 Celotna veriga blokov je replicirana na vsaki sodelujoči entiteti.
+Slika \ref{blockchain} shematsko prikazuje podatkovno verigo.
+
+\begin{figure}[h]
+	\includegraphics[width=1.0\textwidth]{slike/blockchain.png}
+	\caption{Podatkovna veriga}
+	\label{blockchain}
+\end{figure}
 
 Kombinacija teh pristopov omogoča, da nobena izmed sodelujočih entitet ne more spreminjati že zapisanih blokov.
-Napad na omrežje je možen le s pridobitvijo več kot polovice vseh sodelujočih entitet v omrežju, ki bi potrjevale resničnost ponarejenih transakcij in sčasoma sestavile daljšo podatkovno verigo, ki bi obveljala kot trenutna resnica.
+Napad na omrežje je možen le s prevzemom več kot polovice vseh sodelujočih entitet v omrežju, ki bi potrjevale resničnost ponarejenih transakcij in sčasoma sestavile daljšo podatkovno verigo, ki bi obveljala kot trenutna resnica.
 Takemu okolju lahko zaupamo, brez da bi potrebovali centralno avtoriteto, ki bi ji zaupali vsi sodelujoči.
 
-Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t.i. pametne pogodbe.
+Za interakcijo z glavno knjigo in zapisovanje novih informacij, omrežje uporablja t. i. pametne pogodbe.
 To je del programske kode, ki se lahko odziva na dogodke v omrežju, izvede zapisano poslovno logiko ter ustvarja nove transakcije \cite{hyperledgerDocs}.
 
 V nadaljevanju tega poglavja se bomo posvetili osnovnim konceptom ter predstavili posebnosti dveh implementacij te tehnologije -- omrežji Ethereum in Hyperledger Fabric.
@@ -650,21 +660,21 @@ V želji zgraditi sistem, ki bo omogočal decentralizirano izvajanje storitev in
 \section{Razlaga osnovnih konceptov}
 
 \subsection{Porazdeljena glavna knjiga}
-V osrčju tehnologije podatkovnih blokov je porazdeljena glavna knjiga, ki vsebuje zapise o vseh transakcijah, izvedenih na omrežju.
+V osrčju tehnologije podatkovnih blokov je porazdeljena glavna knjiga, ki hrani zapise o vseh transakcijah, izvedenih na omrežju.
 Glavna knjiga je replicirana na vseh entitetah v omrežju, ki med sabo sodelujejo in skrbijo za vzdrževanje.
-Informacije se v glavno knjigo le dodajajo z uporabo kriptografskih tehnik, ki zagotavljajo, da je vsaka zapisana transakcija trajna in nespremenljiva.
+Informacije se v glavno knjigo dodajajo z uporabo kriptografskih tehnik, ki zagotavljajo, da je vsaka zapisana transakcija trajna in nespremenljiva.
+V glavno knjigo lahko podatke le dodajamo, brisanje in popravljanje obstoječih transakcij ni možno.
 To omogoča enostavno preverjanje izvora informacije, od tu tudi drugo poimenovanje za tehnologijo podatkovnih blokov kot sistem dokazovanja (ang. system of proof) \cite{hyperledgerDocs}.
 Vsak morebitni napadalec bi moral spremeniti vse naslednike bloka, ki ga želi spremeniti ter to početi hitreje, kot vsi preostali udeleženci skupaj \cite{hampton2016understanding}.
 
 \subsection{Pametne pogodbe}
-Pametne pogodbe omogočajo kontroliran dostop in interakcijo z glavno knjigo.
+Pametne pogodbe omogočajo nadzorovan dostop in interakcijo z glavno knjigo.
 So osnovni mehanizem za enkapsulacijo informacij in njihovo preprosto vzdrže\-vanje preko omrežja.
-Poleg tega omogočajo tudi določeno stopnjo avtomatizacije, kot je izvrševanje transakcij brez človeškega posredovanja.
+Poleg tega omogočajo tudi določeno stopnjo samodejnosti, kot je izvrševanje transakcij brez človeškega posredovanja.
 V primerjavi s tradicionalnimi pogodbami nam pametne pogodbe zagotavljajo višjo stopnjo varnosti in zmanjšujejo dodatne stroške, ki so povezani z njihovim izvajanjem \cite{atzei2017survey}.
 Leta 1996 je Nick Szabo prvič uporabil izraz pametna pogodba:
 \textit{Sam imenujem novodobne pogodbe pametne pogodbe,  saj so
-veliko bolj uporabne kot njihove papirne različice.  Pametna po-
-godba namreč vsebuje digitalno določena zagotovila in protokole,
+veliko bolj uporabne kot njihove papirne različice.  Pametna pogodba namreč vsebuje digitalno določena zagotovila in protokole,
 ki jim sledijo vse pogodbene stranke \cite{szabo1996smart, balanticd}.}
 
 Na sliki \ref{smart_contract} je prikazan osnovni potek interakcije pametne pogodbe z glavno knjigo.
@@ -699,20 +709,20 @@ V javnih okoljih teh ugodnosti ne uživamo.
 V omrežju lahko sodeluje kdorkoli in to povsem anonimno,
 med udeleženci tako privzeto velja načelo nezaupanja.
 Zaupa se le stanju celotne najdaljše podatkovne verige.
-Tipično so za potrjevanje blokov in novih transakcij uporabljene kriptovalute, pridobljene s t.i. postopkom rudarjenja.
-Kriptovalute (ang. cryptcurrencies) predstavljajo plačilno sredstvo za opravljeno računsko delo entitete, ki potrjuje opravljeno transakcijo.
+Tipično so za potrjevanje blokov in novih transakcij uporabljene kriptovalute, pridobljene s t. i. postopkom rudarjenja.
+Kriptovalute (ang. cryptocurrencies) predstavljajo plačilno sredstvo za opravljeno računsko delo entitete, ki potrjuje opravljeno transakcijo.
 Ta omrežja večinoma temeljijo na Byzantine Fault-Tolerance (BFT) \cite{hyperledgerDocs, castro1999practical}.
-Byzantine Fault-Tolerance je algoritem za dosego soglasja med sodelujočimi entitetami, med katerimi ne velja načelo zaupanja in ki predpostavlja nezanesljiv prenosni medij.
+Byzantine Fault-Tolerance je algoritem za dosego soglasja med sodelujočimi entitetami, med katerimi ne velja načelo zaupanja in  predpostavlja nezanesljiv prenosni medij.
 
 \subsection{Zasebnost in zaupnost}
 Javne podatkovne verige so replicirane na vseh sodelujočih entitetah, kar prinaša transparentnost, obenem pa poslovnim subjektom onemogoča učinko\-vito sklepanje dodatnih ugodnosti, aneksov ipd. s poslovnimi partnerji.
-Ena od možnih rešitev problema bi bila enkripcija podatkov, ki pa v tem primeru ni mogoča.
-Vsak izmed sodelujočih ima dostop do celotne glavne knjige, kar omogoča enostavne napade s silo.
+Ena od možnih rešitev problema bi bila šifriranje podatkov, ki pa v tem primeru ni najbolj primerno in varno.
+Vsak izmed sodelujočih ima dostop do celotne glavne knjige, kar omogoča napade s silo nad šifriranimi podatki.
 V nadaljevanju predstavljeno omrežje Fabric tu vpeljuje koncept kanalov.
 Ti predstavljajo logično grupiranje posameznih entitet in omejujejo dostop do pametnih pogodb in glavne knjige na posameznem kanalu \cite{hyperledgerDocs}.
 
 V nadaljevanju bomo predstavili omrežji Ethereum in Hyperledger Fabric.
-Prvo je predstavnik javnega omrežja, podatkovna veriga se v celoti replicira na vse sodelujoče udeležence, identitete katerih niso preverjene.
+Prvo je predstavnik javnega omrežja, podatkovna veriga se v celoti replicira na vse sodelujoče udeležence, katerih identitete niso preverjene.
 Hyperledger Fabric zaupnost naslavlja drugače in želi zagotoviti preverljivo identiteto posameznega udeleženca v omrežju, največkrat vezano na fizično identiteto.
 Ta razlika v zasnovi za seboj prinese dodatne mehanizme preverjanja v omrežju Ethereum, ki pri omrežju Hyperledger Fabric niso nujno potrebna.
 
@@ -753,7 +763,7 @@ Sestavni deli transakcije so:
 \end{itemize}
 
 Sporočila so namenjena interni komunikaciji med pametnimi pogodbami.
-So le navidezni objekti, obstajajo izključno v izvajalnem okolju.
+So le navidezni objekti, ki obstajajo izključno v izvajalnem okolju.
 Sestavlja jih \cite{ethereumWhitepaper}:
 \begin{itemize}
 	\item pošiljatelj
@@ -825,19 +835,19 @@ V teoriji nam omogoča paralelizacijo in posledično višjo zmogljivost celotneg
 \subsubsection{Modularnost}
 Omrežje sestoji iz šestih osnovnih komponent, ki jih je moč poljubno menjati \cite{hyperledgerDocs}:
 \begin{enumerate}
-	\item urejevalnik (ang. ordering service)
-	\item upravitelj članstva (ang. membership service) -- povezuje zunanje entitete z njihovimi kriptografskimi predstavitvami
-	\item P2P gossip protocol - opcijski
-	\item pametne pogodbe (\textit{chaincode}) - procesno izolacijo zagotavlja izvajanje znotraj vsebnikov Docker. 
-	Onemogočen je neposreden dostop do glavne knjige
-	\item Sistem za upravljanje podatkovne baze (ang. DBMS)
-	\item zamenljiva politika potrjevanja in validiranja
+	\item Urejevalnik (ang. ordering service).
+	\item Upravitelj članstva (ang. membership service) -- povezuje zunanje entitete z njihovimi kriptografskimi predstavitvami.
+	\item P2P gossip protocol - opcijski.
+	\item Pametne pogodbe (\textit{chaincode}) - procesno izolacijo zagotavlja izvajanje znotraj vsebnikov Docker. 
+	Onemogočen je neposreden dostop do glavne knjige.
+	\item Sistem za upravljanje podatkovne baze (ang. DBMS).
+	\item Zamenljiva politika potrjevanja in validiranja.
 \end{enumerate}
 
 \subsubsection{Pametne pogodbe}
 Pametne pogodbe so delčki programske kode, ki se izvajajo kot distribuirane aplikacije.
 Tri glavne značilnosti teh aplikacij so: veliko število sočasno izvajanih pametnih pogodb, dinamično dodajanje v omrežje in v osnovi nevrednost zaupanja.
-Obstoječi načini izvajanja pogodb so umeščene v arhitekturo uredi-izvedi.
+Obstoječi načini izvajanja pogodb so umeščeni v arhitekturo uredi-izvedi.
 Za njih je značilno, da transakcije validirajo in sekvečno uredijo, temu pa sledi propagacija potrjenih blokov po omrežju.
 Vsaka sodelujoča entitea nato transakcije izvede v tem vrstem redu.
 Za enoličen način sekvenčnega izvajanja tu nastane potreba po novem, determinističnem programskem jeziku.
@@ -845,7 +855,7 @@ En izmed predstavnikov je programski jezik za programiranje pogodb v omrežju Et
 Ker je vsaka izmed transakcij izvedena s strani vsake entitete, to predstavlja veliko porabo razpoložljivih virov ter omejuje skaliranje ter učinkovitost izvajanja \cite{hyperledgerDocs}.
 
 Fabric pametne pogodbe izvaja po arhitekturi izvedi-uredi-validiraj.
-Vsaka transakcija je najprej izvedena s čimer se preveri njeno pravilnost.
+Vsaka transakcija je najprej izvedena, s čimer se preveri njeno pravilnost.
 Nato je urejena glede na protokol za doseganje soglasja.
 Ob koncu je transakcija validirana s strani za to pooblaščenih zunanjih entitet.
 Tu v igro vstopi domensko specifična politika potrjevanja.
@@ -859,7 +869,7 @@ Poslovna logika je kompleksnejša in decentralizirane storitve se izvajajo na po
 Za decentralizirano izvajanje moramo decentralizirati vsako izmed komponent, ki sestavljajo trenutne centralizirane sisteme.
 Poleg tega moramo zagotoviti tudi preverljivost samega izvajanja, podobno kot pri pametnih pogodbah.
 Trenutno znamo varno hraniti podatke na tisoče napravah ter hkrati zagotavljati njihovo pristnost.
-Zamisli o decentraliziranem registru smo osnovali prav na tej lastnosti, kar je podrobneje razloženo v poglavju \ref{ch4}.
+Zamisel o decentraliziranem registru smo osnovali prav na tej lastnosti, kar je podrobneje razloženo v poglavju \ref{ch4}.
 
 \chapter{Decentralizirano izvajanje mikrostoritev}
 \label{ch4}
@@ -977,12 +987,12 @@ Od tu naprej komunikacija med storitvami poteka preko izbranega protokola (REST,
 	\label{discover_service}
 \end{figure}
 
-Deregistracija dApija predstavlja težji del naloge, ker ni centralnega procesa, ki bi bdel nad registriranimi dApiji in preverjal njihovo dosegljivost.
+Odjava dApija predstavlja težji del naloge, ker ni centralnega procesa, ki bi bdel nad registriranimi dApiji in preverjal njihovo dosegljivost.
 V centraliziranem sistemu register storitev skrbi za seznam aktivnih storitev in registrirane storitve spremlja, ter jih ob neodzivnosti odstrani iz seznama.
 Glavna knjiga, ki tu predstavlja register storitev, ni samostojen proces, ki bi vzdrževal aktualen seznam aktivnih storitev.
-Potrebno bo dodatno raziskovalno delo, kako učinkovito deregistrirati storitev, podobno kot je to rešeno pri trenutno uporabljenih registrih (etcd, Consul, ZooKeeper).
+Potrebno bo dodatno raziskovalno delo, kako učinkovito odjaviti storitev, podobno kot je to rešeno pri trenutno uporabljenih registrih (etcd, Consul, ZooKeeper).
 Možne rešitve so naključno preverjanje storitev s klicem vnaprej dogovorjene dostopne točke oziroma periodično preverjanje s strani za to določenih entitet.
-Za deregistracijo posamezne storitve je tako zaenkrat odgovoren nadzorni proces.
+Za odjavo posamezne storitve je tako zaenkrat odgovoren nadzorni proces.
 
 \chapter{Implementacija predlagane rešitve}
 \label{ch5}
@@ -1012,7 +1022,7 @@ Nadzorni proces za izvajanje decentraliziranih storitev (dApijev) skrbi za:
 Komunikacija z nadzornim procesom trenutno poteka preko aplikacijskega vmesnika REST, v načrtu pa je implementacija vmesnikov za konzolni nadzor ter podpora novejšim komunikacijskim protokolom kot so gRPC, Apache Trift in podobni.
 Nadzorni proces se izvaja na gostiteljski napravi.
 
-Za registracijo novee aplikacije nadzornemu procesu podamo pot do slike vsebnika Docker.
+Za registracijo nove aplikacije nadzornemu procesu podamo pot do slike vsebnika Docker.
 Sistem poskrbi za distribucijo slike v omrežje IPFS in podatke o storitvi doda v shrambo pogodbe na omrežju Ethereum.
 Ob uspešni registraciji se sproži dogodek, ki sodelujoče izvajalce obvesti o novi aplikaciji, pripravljeni za izvajanje.
 Te se na dogodek lahko odzovejo z zahtevo za pričetek izvajanja dApija.
@@ -1020,7 +1030,7 @@ Trenutno je izvajanje novega dApija potrebno sprožiti ročno, ko bo pripravljen
 Želeno aplikacijo se pridobi iz omrežja IPFS, sliko vsebnika se naloži v izvajalno okolje Docker in zažene.
 dApi sam poskrbi za registracijo in odkrivanje ostalih storitev v omrežju.
 
-Implementacijo nadzornega procesa za dApije smo izvedli z uporabo ogrodja KumuluzEE.
+Implementacijo nadzornega procesa za dApije smo izvedli z uporabo ogro\-dja KumuluzEE.
 KumuluzEE je odprtokodno ogrodje za razvoj mikrostoritev s tehnologijami Java EE.
 Ogrodje nam omogoča enostaven prehod iz monolitne arhitekture v arhitekturo mikrostoritev \cite{kumuluzee}.
 Izvajanje storitve se izvede preko konfiguracijske datoteke, ki smo jo za potrebe decentraliziranega izvajanja dopolnili (\ref{conf}):
@@ -1056,10 +1066,10 @@ Podobno, kot želimo izvajanje storitev decentralizirati, želimo poskrbeti tudi
 V implementaciji smo uporabili decentralizirano shrambo IPFS.
 Gre za projekt, osnovan na omrežju Ethereum, glavni cilj pa je shranjevanje datotek v porazdeljeni shrambi.
 Dostop do datotek poteka prek omrežja P2P, protokol za izmenjavo datotek BitSwap je podoben protokolu BitTorrent.
-Vsako datoteko, ki jo želimo shraniti v omrežje, odjemalec razbije na podatkovne bloke, izračuna zgoščeno vrednost posameznega bloka, te vrednosti pa nato sestavi v strukturo imenovano Merkle Tree.
+Vsako datoteko, ki jo želimo shraniti v omrežje, odjemalec razbije na podatkovne bloke, izračuna zgoščeno vrednost posameznega bloka, te vrednosti za tem sestavi v strukturo imenovano Merkle Tree.
 Datoteko pridobimo enostavno preko zgoščene vrednosti v korenu drevesa.
-Omrežje je sposobno poiskati posamezne koščke prvotne datoteke, njeno vsebino pa hitro preveri z izračunom zgoščene vrednosti. 
-V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, v kolikor sistem uspe sestaviti podatkovno strukturo Merkle Tree, katerega zgoščena vrednost v korenu drevesa je identična podani \cite{Ipfs}.
+Omrežje je sposobno poiskati posamezne koščke prvotne datoteke in njeno vsebino hitro preveriti z izračunom zgoščene vrednosti. 
+V kolikor nam kdo želi podtakniti napačne bloke posamezne datoteke, sistem to prepozna in neveljavne bloke preprosto zavrže, ko od ostalih sodelujočih entitet prejme iste dele datoteke. Datoteka je veljavna, v kolikor sistem uspe sestaviti podatkovno strukturo Merkle Tree, pri katerem je korenska zgoščena vrednost identična podani \cite{Ipfs}.
 
 \section{Odjemalec za omrežje Ethereum}
 Sistem za delovanje potrebuje odjemalca, ki se zna povezati v omrežje Ethereum.
@@ -1076,7 +1086,7 @@ Pametna pogodba, ki predstavlja register storitev in osrednji del sistema, je na
 
 Osnovni konstrukti zasnovane pogodbe so strukture User, dApi, Worker in Execution (\ref{user}).
 
-\begin{lstlisting}[caption={Osnovni konstrukti pametne pogodbe},captionpos=b,label={user}]
+\begin{lstlisting}[caption={Osnovni konstrukti pametne pogodbe za decentraliziran register storitev},captionpos=b,label={user}]
 contract Registry {
 	struct User {
 		string friendlyName;
@@ -1134,17 +1144,16 @@ function registerApi(string _name,
 	emit dApiPublished(_name, _version, msg.sender,
 	_hash);
 }
-...
 \end{lstlisting}
 
-Proces deregistracije izvajanja storitve je kompleksnejši postopek, ki zahteva kar nekaj računskega dela (\ref{deregisterService_f}).
-Dokler je v sistemu malo registriranih izvajalnih enot je deregistracija hitra in za uporabnika neopazna, tako z vidika časa kot cene.
+Proces odjave izvajanja storitve je kompleksnejši postopek, ki zahteva kar nekaj računskega dela (\ref{deregisterService_f}).
+Dokler je v sistemu malo registriranih izvajalnih enot je odjava hitra in za uporabnika neopazna, tako z vidika časa kot cene.
 Problem nastopi v primeru velikega števila izvajalnih enot.
 Podatki o izvajalni enoti so shranjene v polju.
 Na testnem omrežju \textit{Rinkeby} smo ob testiranju večjega števila registriranih izvajalnih enot presegli omejitev računskih korakov na transakcijo (ang. gas).
-Vzrok za preseženo dovoljeno računsko zahtevnost je zanka, ki poišče storitev, ki jo želimo deregistrirati.
+Vzrok za preseženo dovoljeno računsko zahtevnost je zanka, ki poišče storitev, ki jo želimo odjaviti.
 
-\begin{lstlisting}[caption={Deregistracija izvajanja},captionpos=b,label={deregisterService_f}]
+\begin{lstlisting}[caption={Odjava izvajanja},captionpos=b,label={deregisterService_f}]
 function deregisterExecution(bytes32 _apiHash, 
 uint _wIndex) public {
 	if (_wIndex >= dAPIExecutors[_apiHash].length)
@@ -1159,7 +1168,7 @@ uint _wIndex) public {
 }
 \end{lstlisting}
 
-Računsko še zahtevnejši problem nastopi ob deregistraciji izvajalca, tu bi bilo potrebno iterirati preko vseh registriranih storitev in poiskati izvajalca za brisanje.
+Računsko še zahtevnejši problem nastopi ob odjavi izvajalca, tu bi bilo potrebno iterirati preko vseh registriranih storitev in poiskati izvajalca za brisanje.
 Ta del registra še ni implementiran in potrebuje dodatno pozornost v prihodnje.
 
 
@@ -1174,7 +1183,7 @@ Vmesnik mora biti intuitiven in enostaven za uporabo, zato smo za zgled vzeli po
 Razširitev vsebuje dve anotaciji, s katerima opremimo obstoječo aplikacijo.
 Prva služi registraciji storitve, z njo pa se opremi glavni aplikacijski razred storitve REST, ki je trenutno edini podprt način komunikacije (\ref{annotationReg}).
 
-\begin{lstlisting}[caption={Anotacija za registracijo},captionpos=b,label={annotationReg}]
+\begin{lstlisting}[caption={Anotacija za registracijo storitve},captionpos=b,label={annotationReg}]
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
@@ -1191,17 +1200,14 @@ Podatki, ki jih beležimo o posamezni storitvi so: \textit{ime (ang. name), okol
 
 Druga anotacija skrbi za označevanje parametrov, ki jih preko javanske tehnologije CDI, vrinemo v spremenljivke (\ref{annotationD}).
 
-\begin{lstlisting}[caption={Anotacija za deregistracijo},captionpos=b,label={annotationD}]
+\begin{lstlisting}[caption={Anotacija za odkrivanje storitve},captionpos=b,label={annotationD}]
 @Qualifier
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DiscoverDApi {
 	@Nonbinding String name() default "";
-	
 	@Nonbinding String environment() default "";
-	
 	@Nonbinding String version() default "";
-	
 	@Nonbinding ApiType apiType()
 	 default ApiType.REST;
 }
@@ -1211,7 +1217,7 @@ public @interface DiscoverDApi {
 Preko procesiranja anotacij pridobimo podatke o želeni storitvi, pri inicializaciji pa razširitev poskrbi za samodejno registracijo oziroma odkrivanje storitve.
 Za delovanje razširitve potrebujemo omogočeno tehnologijo CDI.
 Metoda za registracijo storitve je povsem enostavna, uporabljamo pa knjižnico Web3j.
-Web3j je majhna knjižnica, namenjena aplikacijam Java in Android, ki se zna povezati na omrežje Ethereum.
+Web3j je knjižnica, namenjena aplikacijam Java in Android, ki se zna povezati na omrežje Ethereum.
 Klice na REST vmesnik odjemalca (geth, parity) ovije v razrede in metode, omogoča pa tudi pretvorbo pametnih pogodb, napisanih v jeziku Solidity, v javanske razrede \cite{web3j}.
 Izsek programske kode \ref{startE} prikazuje postopek registracije izvajanja.
 
@@ -1220,17 +1226,19 @@ private void registerService(
 	ServiceExecution apiExecutionDetails) {
 	
 	logger.info("Registering new service execution");
+	
 	registry
 	.registerService(apiExecutionDetails.getApiHash(),
 	 apiExecutionDetails.getWorker(),
 	 apiExecutionDetails.getLocation()).observable()
 	.subscribe(tx -> {
-	BigInteger gasUsed = tx.getGasUsed();
-	logger.info("New dApi executor registered: "
-	 + apiExecutionDetails.toString() + 
-	 ". Gas spent: " + gasUsed);
-	logger.info("Block number: "
-	 + tx.getBlockNumber());
+		BigInteger gasUsed = tx.getGasUsed();
+		logger.info("New dApi executor
+		 registered: "
+	 	+ apiExecutionDetails.toString() + 
+	 	". Gas spent: " + gasUsed);
+		logger.info("Block number: "
+	 	+ tx.getBlockNumber());
 	});
 }
 \end{lstlisting}
@@ -1276,7 +1284,7 @@ Na tem mestu storitev ne bomo posebej predstavljali.
 
 \section{Testiranje}
 Pred zagonom sistema je potrebno ustvariti račun (ang. account) na omrežju Ethereum in opraviti inicializacijo odjemalca IPFS.
-Identiteto na omrežju Ethereum pridobimo enostavno že z nekaj kliki, v kolikor se poslužimo grafičnega vmesnika Ethereum denarnice, oziroma preko ukazne vrstice z ukazom \texttt{geth account new}.
+Identiteto na omrežju Ethereum pridobimo enostavno že z nekaj kliki, v kolikor se poslužimo gra\-fi\-čne\-ga vmesnika denarnice Ethereum, oziroma preko ukazne vrstice z ukazom \texttt{geth account new}.
 Odjemalec nas nato vodi skozi celoten postopek ustvarjanja uporabniškega računa, ki ga zaščitimo z geslom.
 Podobno enostavna je inicializacija odjemalca IPFS, s to razliko, da edini uporabniški vmesnik predstavlja ukazna vrstica.
 Z ukazom \texttt{ipfs init} sprožimo postopek ustvarjanja računa, s katerim se kasneje predstavljamo v omrežju.
@@ -1318,15 +1326,15 @@ V podpoglavju \ref{improvments} so težave podrobneje opisane.
 \label{improvments}
 
 Prva različica sistema ponuja kar nekaj možnosti za izboljšave.
-Prva izmed pomankljivosti je sama cena registracije in deregistracije storitev in njihovih izvajalcev.
+Prva izmed pomankljivosti je sama cena registracije in odjave storitev in njihovih izvajalcev.
 Vsaka registracija novega izvajalca pomeni nov zapis na podatkovno verigo, kar v dinamičnem sistemu in ob trenutnih cenah transakcije na Ethereum omrežju predstavlja potencialno veliko finančno breme za izvajalca.
-Zahtevnejša od prve je druga pomankljivost sistema in sicer deregistracija izvajalca.
+Zahtevnejša od prve je druga pomankljivost sistema in sicer odjava izvajalca.
 Brisanje podatkov iz podatkovne verige je nemogoče zaradi same zasnove tehnologije -- nespremenljivost.
 S transakcijo je možno le navidezno brisati z razveljavitvijo pretekle transakcije, zapis na podatkovni verigi pa ostane.
 Temu se ni moč izogniti, gre namreč za posledico enega od glavnih konceptov tehnologije veriženja podatkovnih blokov -- nespremenljivost.
-Brisanje je prav tako razmeroma draga operacija, posebno velik problem predstavlja brisanje izvajalca in s tem posledično še deregistracijo vseh storitev, ki jih je izvajalec v trenutku prekinitve izvajanja izvajal.
+Brisanje je prav tako razmeroma draga operacija, posebno velik problem predstavlja brisanje izvajalca in s tem posledično še odjavo vseh storitev, ki jih je izvajalec v trenutku prekinitve izvajanja izvajal.
 
-Dodatni mehanizmi, ki jih poznajo obstoječi sistemi za odkrivanje storitev, so še samodejna deregistracija storitve ob vnaprej določenem pretečenem času neaktivnosti.
+Dodatni mehanizmi, ki jih poznajo obstoječi sistemi za odkrivanje storitev, so še samodejna odjava storitve ob vnaprej določenem pretečenem času neaktivnosti.
 Trenutna implementacija tega mehanizma še ne pozna, problem predstavlja predvsem decentralizacija.
 V tem sistemu ni centralne storitve, ki bi ob določenem času iz registra preprosto brisala vse neaktivne storitve.
 Sistem potrebuje nov mehanizem, ki bo znal med storitvami poiskati neaktivne in jih odstraniti iz registra.
@@ -1334,7 +1342,7 @@ Kakšen bo mehanizem in princip delovanja sta v tem trenutku neznanka.
 
 Sistem potrebuje način prerazporejanja zahtev po omrežju.
 Kdo izmed trenutno registriranih izvajalcev bo lahko najhitreje odgovoril?
-Hiter odgovor je pogojen s fizično oddaljenostjo gostitelja od izvajalca, omrežnimi zakasnitvami ter hitrostjo samega izvajalca. Reševanje teh izzivov je naslednje v vrsti za praktično uporaben sistem.
+Hiter odgovor je pogojen s fizično oddaljenostjo gostitelja od izvajalca, omrežnimi zakasnitvami ter hitrostjo samega izvajalca. Reševanje teh izzivov je naslednje v vrsti za praktično uporabnost sistema.
 
 
 Vsakega izvajalca storitve želimo za uspešno izveden klic ustrezno finančno nagraditi. Tu se poraja več vrst odprtih vprašanj, izstopa predvsem vprašanje finančne vrednosti posameznega klica in način preverjanja pravilnosti izvedbe klica.
